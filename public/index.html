@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+  window.Telegram.WebApp.expand();
+  const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+  const USER_ID = tgUser?.id ? String(tgUser.id) : 'demo';
+  const API = window.location.origin;
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>PROTOCOL 2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d1a;
+  --card: rgba(255,255,255,0.05);
+  --card2: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.1);
+  --accent: #7B6EF6;
+  --accent2: #a78bfa;
+  --grad: linear-gradient(135deg, #7B6EF6, #b06ef6, #6eb4f6);
+  --grad2: linear-gradient(135deg, #6B5EE6 0%, #9B6EFF 50%, #6EAAF6 100%);
+  --text: #fff;
+  --muted: rgba(255,255,255,0.45);
+  --green: #4ade80;
+  --red: #f87171;
+  --yellow: #fbbf24;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  background: #13132b;
+  font-family: 'Manrope', sans-serif;
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+.phone {
+  width: 375px;
+  height: 750px;
+  background: var(--bg);
+  border-radius: 44px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 40px 80px rgba(0,0,0,0.6), 0 0 120px rgba(123,110,246,0.2);
+}
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 22px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  overflow: hidden;
+  overflow-y: auto;
+}
+.screen.active { opacity:1; pointer-events:all; }
+.glow-orb { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; z-index:0; }
+.screen > * { position:relative; z-index:1; width:100%; }
+
+/* TYPOGRAPHY */
+.h1 { font-family:'Unbounded',sans-serif; font-size:38px; font-weight:900; line-height:1.1; text-align:center; }
+.h2 { font-family:'Unbounded',sans-serif; font-size:28px; font-weight:800; line-height:1.2; text-align:center; }
+.grad-text { background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+/* BUTTON */
+.btn {
+  width:100%; padding:17px; border:none; border-radius:100px;
+  font-family:'Manrope',sans-serif; font-size:16px; font-weight:700;
+  cursor:pointer; transition: transform 0.12s, box-shadow 0.15s, background 0.15s;
+  position:relative; overflow:hidden; display:block;
+}
+.btn:active { transform:scale(0.96); }
+.btn-primary { background:var(--grad2); color:#fff; box-shadow:0 8px 32px rgba(123,110,246,0.45); }
+.btn-primary:hover { box-shadow:0 12px 40px rgba(123,110,246,0.6); }
+.btn-ghost { background:var(--card2); color:#fff; border:1px solid var(--border); backdrop-filter:blur(10px); }
+.btn-ghost:hover { background:rgba(255,255,255,0.12); }
+.btn-danger { background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.3); }
+.btn-green { background:rgba(74,222,128,0.15); color:var(--green); border:1px solid rgba(74,222,128,0.3); }
+
+/* RIPPLE */
+.ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,0.22); transform:scale(0); animation:ripAnim 0.5s linear; pointer-events:none; }
+@keyframes ripAnim { to { transform:scale(4); opacity:0; } }
+
+/* INPUT */
+.input {
+  width:100%; padding:17px 20px;
+  background:var(--card2); border:1px solid var(--border); border-radius:16px;
+  color:#fff; font-family:'Manrope',sans-serif; font-size:15px; outline:none;
+  transition:border-color 0.2s, box-shadow 0.2s; backdrop-filter:blur(10px);
+}
+.input::placeholder { color:var(--muted); }
+.input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(123,110,246,0.2); }
+
+/* CARD */
+.card { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:20px; padding:18px; backdrop-filter:blur(10px); }
+
+/* BACK */
+.back-btn {
+  width:36px; height:36px; min-width:36px; background:var(--card2); border:1px solid var(--border);
+  border-radius:12px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:18px; transition:background 0.2s; flex-shrink:0; width:auto;
+}
+.back-btn:active { transform:scale(0.93); }
+
+/* DOTS */
+.dots { display:flex; gap:6px; justify-content:center; }
+.dot { width:6px; height:6px; border-radius:3px; background:var(--muted); transition:all 0.3s; }
+.dot.on { width:20px; background:var(--accent); }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position:absolute; bottom:0; left:0; right:0;
+  background:rgba(13,13,26,0.96); border-top:1px solid var(--border);
+  display:none; padding:10px 8px 22px; gap:2px; backdrop-filter:blur(20px); z-index:50;
+}
+.nav-item {
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:8px 4px; border-radius:14px; cursor:pointer; transition:all 0.2s;
+  border:none; background:transparent; color:var(--muted); font-family:'Manrope',sans-serif;
+}
+.nav-item:active { transform:scale(0.90); }
+.nav-item.active { color:var(--accent2); background:rgba(123,110,246,0.12); }
+.nav-icon { font-size:20px; }
+.nav-label { font-size:10px; font-weight:600; }
+
+/* SPHERE BTN */
+.sphere-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; }
+.sphere-btn {
+  padding:13px 14px; background:var(--card); border:1px solid var(--border);
+  border-radius:100px; color:#fff; font-family:'Manrope',sans-serif; font-size:13px;
+  font-weight:600; cursor:pointer; text-align:left; display:flex; align-items:center;
+  gap:8px; transition:all 0.2s;
+}
+.sphere-btn.sel { background:rgba(123,110,246,0.25); border-color:var(--accent); color:var(--accent2); }
+.sphere-btn:active { transform:scale(0.95); }
+
+/* SUCCESS */
+.success-orb {
+  width:90px; height:90px; background:var(--card2); border:1px solid var(--border);
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:40px; margin:0 auto; animation:pulseGlow 2s infinite; width:auto;
+}
+@keyframes pulseGlow { 0%,100%{box-shadow:0 0 0 0 rgba(123,110,246,0.3);} 50%{box-shadow:0 0 0 20px rgba(123,110,246,0);} }
+
+/* DASHBOARD */
+.profile-row { display:flex; align-items:center; gap:12px; }
+.avatar { width:46px; height:46px; min-width:46px; border-radius:50%; background:var(--grad2); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; }
+.level-badge { padding:6px 14px; background:var(--card2); border:1px solid var(--border); border-radius:100px; font-size:12px; font-weight:700; display:flex; align-items:center; gap:5px; white-space:nowrap; margin-left:auto; }
+.xp-section { width:100%; }
+.xp-header { display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:8px; }
+.xp-bar-bg { height:8px; background:var(--card2); border-radius:4px; overflow:hidden; }
+.xp-bar-fill { height:100%; background:var(--grad2); border-radius:4px; transition:width 0.8s ease; box-shadow:0 0 10px rgba(123,110,246,0.6); }
+.stats-row { display:flex; gap:8px; width:100%; }
+.stat-card { flex:1; background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
+.stat-val { font-family:'Unbounded',sans-serif; font-size:16px; font-weight:900; color:var(--accent2); }
+.stat-lbl { font-size:10px; color:var(--muted); margin-top:3px; }
+
+/* TASK ROWS */
+.task-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); cursor:pointer; transition:opacity 0.2s; }
+.task-row:last-of-type { border-bottom:none; }
+.task-row:active { opacity:0.7; }
+.task-check { width:26px; min-width:26px; height:26px; background:var(--card); border:1.5px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; transition:all 0.2s; }
+.task-check.done { background:var(--accent); border-color:var(--accent); }
+.task-text { font-size:13px; color:rgba(255,255,255,0.8); transition:all 0.2s; flex:1; }
+.task-text.done { text-decoration:line-through; color:var(--muted); }
+.task-xp { font-size:11px; font-weight:700; color:var(--accent2); white-space:nowrap; }
+
+/* LEADERBOARD */
+.top3 { display:flex; align-items:flex-end; justify-content:center; gap:10px; width:100%; }
+.top-item { display:flex; flex-direction:column; align-items:center; gap:5px; }
+.top-av { border-radius:50%; background:var(--grad2); display:flex; align-items:center; justify-content:center; font-weight:700; }
+.top-av.r1 { width:64px; height:64px; font-size:22px; box-shadow:0 0 24px rgba(255,200,0,0.4); }
+.top-av.r2 { width:52px; height:52px; font-size:18px; }
+.top-av.r3 { width:46px; height:46px; font-size:16px; }
+.top-uname { font-size:11px; font-weight:600; color:var(--muted); }
+.top-xp2 { font-size:12px; font-weight:800; color:var(--accent2); }
+.pedestal { border-radius:8px 8px 0 0; background:var(--card2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-family:'Unbounded',sans-serif; font-size:18px; font-weight:900; width:70px; }
+.p1 { height:56px; background:rgba(255,200,0,0.1); border-color:rgba(255,200,0,0.3); color:#ffd700; }
+.p2 { height:44px; }
+.p3 { height:34px; }
+.lb-item { display:flex; align-items:center; gap:10px; padding:12px; background:var(--card); border:1px solid var(--border); border-radius:14px; width:100%; transition:background 0.2s; }
+.lb-item.me { background:rgba(123,110,246,0.15); border-color:var(--accent); }
+.lb-rank { font-size:13px; font-weight:800; color:var(--muted); width:20px; text-align:center; flex-shrink:0; }
+.lb-av { width:36px; height:36px; min-width:36px; border-radius:50%; background:var(--grad2); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; }
+.lb-info { flex:1; min-width:0; }
+.lb-name { font-size:13px; font-weight:600; }
+.lb-streak { font-size:11px; color:var(--muted); }
+.lb-xp2 { font-size:13px; font-weight:800; color:var(--accent2); white-space:nowrap; }
+.duel-chip { padding:5px 10px; background:rgba(248,113,113,0.15); border:1px solid rgba(248,113,113,0.3); border-radius:100px; color:var(--red); font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s; font-family:'Manrope',sans-serif; flex-shrink:0; }
+.duel-chip:active { transform:scale(0.9); }
+
+/* GOALS */
+.goal-item { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:18px; padding:16px; cursor:pointer; transition:border-color 0.2s; }
+.goal-item:active { transform:scale(0.98); }
+.goal-sphere-tag { font-size:11px; font-weight:700; margin-bottom:6px; }
+.goal-name2 { font-size:15px; font-weight:700; margin-bottom:10px; }
+.goal-prog-bg { height:6px; background:var(--card); border-radius:3px; overflow:hidden; margin-bottom:6px; }
+.goal-prog-fill { height:100%; background:var(--grad2); border-radius:3px; transition:width 0.6s; }
+.goal-prog-lbl { font-size:11px; color:var(--muted); }
+.add-dashed { width:100%; padding:16px; background:var(--card); border:2px dashed var(--border); border-radius:18px; color:var(--muted); font-family:'Manrope',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+.add-dashed:hover { border-color:var(--accent); color:var(--accent2); }
+.add-dashed:active { transform:scale(0.97); }
+
+/* TASK FULL LIST */
+.task-full-row { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:all 0.2s; }
+.task-full-row:active { transform:scale(0.98); }
+.task-sphere-dot { width:10px; height:10px; min-width:10px; border-radius:50%; }
+.task-full-info { flex:1; min-width:0; }
+.task-full-name { font-size:14px; font-weight:600; }
+.task-full-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+.task-full-check { width:28px; height:28px; min-width:28px; background:var(--card); border:1.5px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+.task-full-check.done { background:var(--accent); border-color:var(--accent); }
+.filter-tabs { display:flex; gap:8px; width:100%; }
+.filter-tab { padding:8px 16px; background:var(--card); border:1px solid var(--border); border-radius:100px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; color:var(--muted); font-family:'Manrope',sans-serif; }
+.filter-tab.active { background:rgba(123,110,246,0.2); border-color:var(--accent); color:var(--accent2); }
+.filter-tab:active { transform:scale(0.95); }
+
+/* SETTINGS */
+.settings-av-wrap { display:flex; flex-direction:column; align-items:center; gap:10px; padding:20px 0 8px; }
+.settings-av { width:80px; height:80px; border-radius:50%; background:var(--grad2); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:700; border:3px solid var(--accent); }
+.slabel { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; width:100%; }
+.settings-item { display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--card2); border:1px solid var(--border); border-radius:16px; margin-bottom:8px; cursor:pointer; transition:background 0.2s; width:100%; }
+.settings-item:active { background:rgba(255,255,255,0.1); }
+.s-icon { font-size:20px; width:32px; text-align:center; flex-shrink:0; }
+.s-info { flex:1; }
+.s-name { font-size:14px; font-weight:600; }
+.s-sub { font-size:12px; color:var(--muted); }
+.s-arrow { color:var(--muted); font-size:16px; }
+.toggle { width:44px; min-width:44px; height:26px; background:var(--card); border-radius:13px; position:relative; cursor:pointer; transition:background 0.3s; border:1px solid var(--border); }
+.toggle.on { background:var(--accent); }
+.toggle-knob { position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition:transform 0.3s; box-shadow:0 1px 4px rgba(0,0,0,0.3); }
+.toggle.on .toggle-knob { transform:translateX(18px); }
+.badge-row { display:flex; gap:8px; width:100%; flex-wrap:wrap; }
+.badge2 { display:flex; flex-direction:column; align-items:center; gap:5px; padding:14px 8px; background:var(--card2); border:1px solid var(--border); border-radius:16px; flex:1; min-width:65px; cursor:pointer; transition:all 0.2s; }
+.badge2:active { transform:scale(0.93); }
+.badge2.earned { border-color:var(--accent); background:rgba(123,110,246,0.15); }
+.badge2-icon { font-size:24px; }
+.badge2-lbl { font-size:10px; font-weight:600; color:var(--muted); text-align:center; }
+.badge2.earned .badge2-lbl { color:var(--accent2); }
+
+/* DUEL */
+.duel-vs { display:flex; align-items:center; justify-content:center; gap:20px; width:100%; }
+.duel-player { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.duel-av { width:72px; height:72px; border-radius:50%; background:var(--grad2); display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:700; border:3px solid var(--accent); }
+.duel-av.enemy { background:linear-gradient(135deg,#f97316,#ec4899); border-color:var(--red); }
+.vs-badge { font-family:'Unbounded',sans-serif; font-size:22px; font-weight:900; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; flex-shrink:0; }
+.duel-bars { display:flex; height:12px; border-radius:6px; overflow:hidden; margin:10px 0; }
+.duel-bar-me { background:var(--grad2); transition:width 0.8s; }
+.duel-bar-enemy { background:linear-gradient(135deg,#f97316,#ec4899); flex:1; }
+.duel-task-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); cursor:pointer; }
+.duel-task-row:last-child { border-bottom:none; }
+.duel-task-row:active { opacity:0.7; }
+
+/* MODAL */
+.modal { position:absolute; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:flex-end; z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; backdrop-filter:blur(4px); }
+.modal.open { opacity:1; pointer-events:all; }
+.modal-sheet { width:100%; background:#12122e; border-radius:28px 28px 0 0; padding:28px 22px 40px; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1); border-top:1px solid var(--border); }
+.modal.open .modal-sheet { transform:translateY(0); }
+.modal-handle { width:40px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 24px; }
+.modal-title { font-family:'Unbounded',sans-serif; font-size:20px; font-weight:800; margin-bottom:20px; }
+.modal-close { position:absolute; top:20px; right:22px; width:32px; height:32px; background:var(--card2); border:1px solid var(--border); border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; }
+.modal-close:active { transform:scale(0.9); }
+
+/* TOAST */
+.toast {
+  position:absolute; bottom:100px; left:50%; transform:translateX(-50%) translateY(16px);
+  background:rgba(18,18,46,0.95); border:1px solid var(--border); border-radius:18px;
+  padding:14px 22px; text-align:center; opacity:0; pointer-events:none;
+  transition:all 0.3s; z-index:400; backdrop-filter:blur(20px); white-space:nowrap;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast-val { font-family:'Unbounded',sans-serif; font-size:22px; font-weight:900; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.toast-lbl { font-size:12px; color:var(--muted); margin-top:2px; }
+
+/* SCREEN HEADER */
+.shead { display:flex; align-items:center; gap:12px; width:100%; margin-bottom:14px; flex-shrink:0; }
+
+/* ANIM */
+@keyframes slideIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+.screen.active > * { animation:slideIn 0.35s ease forwards; opacity:0; }
+.screen.active > *:nth-child(1){animation-delay:0s}
+.screen.active > *:nth-child(2){animation-delay:0.05s}
+.screen.active > *:nth-child(3){animation-delay:0.1s}
+.screen.active > *:nth-child(4){animation-delay:0.15s}
+.screen.active > *:nth-child(5){animation-delay:0.2s}
+.screen.active > *:nth-child(6){animation-delay:0.25s}
+.screen.active > *:nth-child(7){animation-delay:0.3s}
+.screen.active > *:nth-child(8){animation-delay:0.35s}
+.screen.active > *:nth-child(9){animation-delay:0.4s}
+
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--card2);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- S1 WELCOME -->
+<div class="screen active" id="s1">
+  <div class="glow-orb" style="width:300px;height:300px;background:rgba(123,110,246,0.18);bottom:-100px;left:50%;transform:translateX(-50%);"></div>
+  <div style="font-family:'Unbounded',sans-serif;font-size:11px;font-weight:600;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;text-align:center;margin-bottom:48px;">Protocol 2.0</div>
+  <div class="h1 grad-text" style="margin-bottom:14px;">Добро<br>пожало&shy;вать</div>
+  <div style="font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:52px;text-align:center;">Настроим твою систему<br>прокачки за 1 минуту</div>
+  <div class="dots" style="margin-bottom:52px;"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+  <button class="btn btn-primary" onclick="nav('s2')">Начать</button>
+</div>
+
+<!-- S2 NAME -->
+<div class="screen" id="s2">
+  <div class="glow-orb" style="width:200px;height:200px;background:rgba(110,164,246,0.15);top:60px;right:-60px;"></div>
+  <div class="glow-orb" style="width:180px;height:180px;background:rgba(176,110,246,0.15);bottom:60px;left:-60px;"></div>
+  <div class="h2" style="margin-bottom:52px;">Как тебя<br>зовут?</div>
+  <input class="input" id="nameInput" type="text" placeholder="Введи имя" style="margin-bottom:20px;">
+  <button class="btn btn-primary" style="margin-top:auto;" onclick="saveName()">Далее</button>
+</div>
+
+<!-- S3 AGE -->
+<div class="screen" id="s3">
+  <div class="glow-orb" style="width:250px;height:250px;background:rgba(123,110,246,0.12);bottom:-80px;right:-80px;"></div>
+  <div class="h2" style="margin-bottom:44px;">Сколько<br>тебе лет?</div>
+  <input class="input" id="ageInput" type="number" min="10" max="99" placeholder="Введите возраст" style="margin-bottom:12px;">
+  <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:40px;line-height:1.5;">Возраст нужен для<br>персонализации задач</div>
+  <button class="btn btn-primary" style="margin-top:auto;" onclick="nav('s4')">Далее</button>
+</div>
+
+<!-- S4 SPHERES -->
+<div class="screen" id="s4" style="justify-content:flex-start;padding-top:44px;">
+  <div class="glow-orb" style="width:300px;height:200px;background:rgba(123,110,246,0.12);bottom:0;left:50%;transform:translateX(-50%);"></div>
+  <div class="h2 grad-text" style="margin-bottom:28px;">Выбери сферы<br>для прокачки</div>
+  <div class="sphere-grid" style="margin-bottom:20px;" id="sphereGrid">
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Тело">💪 Тело</button>
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Разум">🧠 Разум</button>
+    <button class="sphere-btn sel" onclick="toggleSphere(this)" data-s="Финансы">📈 Финансы</button>
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Образование">📚 Образование</button>
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Дисциплина">⚡ Дисциплина</button>
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Духовность">🌱 Духовность</button>
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Отношения">🤝 Отношения</button>
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Топ. жизнь">🔥 Топ. жизнь</button>
+  </div>
+  <button class="btn btn-primary" onclick="saveSpheres()">Продолжить</button>
+</div>
+
+<!-- S5 GOAL -->
+<div class="screen" id="s5" style="justify-content:center;">
+  <div class="glow-orb" style="width:220px;height:220px;background:rgba(110,164,246,0.15);top:40px;right:-70px;"></div>
+  <div class="glow-orb" style="width:180px;height:180px;background:rgba(123,110,246,0.12);bottom:60px;left:-50px;"></div>
+  <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:20px;" id="goalStep">Шаг 1 из 1</div>
+  <div style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:24px;padding:24px;margin-bottom:20px;">
+    <div style="font-size:12px;font-weight:700;margin-bottom:8px;" id="goalSphLabel">Сфера: Тело</div>
+    <div class="h2" style="text-align:left;font-size:22px;margin-bottom:20px;">Какая твоя цель<br>в этой сфере?</div>
+    <input class="input" id="goalInput" type="text" placeholder="Например: сбросить 5 кг" style="margin-bottom:0;">
+  </div>
+  <button class="btn btn-primary" onclick="saveGoal()">Далее</button>
+</div>
+
+<!-- S6 FIRST TASK -->
+<div class="screen" id="s6" style="justify-content:center;">
+  <div class="glow-orb" style="width:280px;height:200px;background:rgba(123,110,246,0.15);bottom:0;left:50%;transform:translateX(-50%);"></div>
+  <div class="h2" style="margin-bottom:12px;">Добавь первую задачу</div>
+  <div style="font-size:14px;color:var(--muted);text-align:center;margin-bottom:32px;">Что ты сделаешь уже завтра?</div>
+  <input class="input" id="taskInput" type="text" placeholder="Например: 30 подтягиваний" style="margin-bottom:20px;">
+  <button class="btn btn-primary" style="margin-top:auto;" onclick="saveFirstTask()">Добавить задачу</button>
+</div>
+
+<!-- S7 SUCCESS -->
+<div class="screen" id="s7" style="justify-content:center;text-align:center;">
+  <div class="glow-orb" style="width:280px;height:280px;background:rgba(123,110,246,0.2);bottom:-80px;left:50%;transform:translateX(-50%);"></div>
+  <div class="success-orb" style="margin-bottom:24px;">✈️</div>
+  <div class="h2" style="margin-bottom:10px;">Профиль создан</div>
+  <div style="font-size:15px;color:var(--muted);margin-bottom:52px;">Ты готов к прокачке</div>
+  <button class="btn btn-ghost" onclick="goToApp()">Перейти в меню</button>
+</div>
+
+<!-- S8 DASHBOARD -->
+<div class="screen" id="s8" style="justify-content:flex-start;padding-bottom:88px;gap:12px;">
+  <div class="glow-orb" style="width:200px;height:200px;background:rgba(123,110,246,0.1);top:-60px;right:-60px;"></div>
+  <div class="profile-row">
+    <div class="avatar" id="av">А</div>
+    <div style="flex:1;">
+      <div style="font-size:16px;font-weight:700;" id="dn">Алекс</div>
+      <div style="font-size:12px;color:var(--muted);" id="rankTitle">Новобранец</div>
+    </div>
+    <div class="level-badge">🛡 <span id="lvBadge">Уровень 1</span></div>
+  </div>
+  <div class="xp-section">
+    <div class="xp-header">
+      <span id="xpLabel">10 XP</span>
+      <span id="xpMax" style="color:var(--muted);">до Ур.2: 90 XP</span>
+    </div>
+    <div class="xp-bar-bg"><div class="xp-bar-fill" id="xpFill" style="width:10%;"></div></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="statS">🔥 1</div><div class="stat-lbl">Стрик</div></div>
+    <div class="stat-card"><div class="stat-val" id="statD">0/3</div><div class="stat-lbl">Задачи</div></div>
+    <div class="stat-card"><div class="stat-val" id="statR">#12</div><div class="stat-lbl">Ранг</div></div>
+  </div>
+  <div class="card" style="padding:18px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;">Сегодня</div>
+      <div style="font-size:20px;cursor:pointer;color:var(--muted);" onclick="openModal('mAddTask')">＋</div>
+    </div>
+    <div id="taskList"></div>
+    <button class="btn btn-primary" style="padding:13px;margin-top:14px;" onclick="completeAll()">Выполнить всё ✓</button>
+  </div>
+</div>
+
+<!-- S9 LEADERBOARD -->
+<div class="screen" id="s9" style="justify-content:flex-start;padding-bottom:88px;gap:12px;">
+  <div class="shead">
+    <div style="font-family:'Unbounded',sans-serif;font-size:17px;font-weight:800;flex:1;">🏆 Топ игроков</div>
+    <button class="btn btn-danger" style="width:auto;padding:8px 14px;font-size:12px;border-radius:100px;" onclick="openModal('mDuel')">⚔️ Дуэль</button>
+  </div>
+  <div class="top3">
+    <div class="top-item"><div class="top-av r2">М</div><div style="font-size:18px;">🥈</div><div class="top-uname">Maxim</div><div class="top-xp2">840 XP</div><div class="pedestal p2">2</div></div>
+    <div class="top-item"><div class="top-av r1">D</div><div style="font-size:18px;">🥇</div><div class="top-uname">Dragon77</div><div class="top-xp2">1240 XP</div><div class="pedestal p1">1</div></div>
+    <div class="top-item"><div class="top-av r3">К</div><div style="font-size:18px;">🥉</div><div class="top-uname">Katya</div><div class="top-xp2">720 XP</div><div class="pedestal p3">3</div></div>
+  </div>
+  <div class="lb-item"><div class="lb-rank">4</div><div class="lb-av">А</div><div class="lb-info"><div class="lb-name">Artem_Pro</div><div class="lb-streak">🔥 14 дн.</div></div><div class="lb-xp2">640 XP</div><button class="duel-chip" onclick="openModal('mDuel')">⚔️ Дуэль</button></div>
+  <div class="lb-item"><div class="lb-rank">5</div><div class="lb-av" style="background:linear-gradient(135deg,#f97316,#ec4899);">S</div><div class="lb-info"><div class="lb-name">Sara_M</div><div class="lb-streak">🔥 9 дн.</div></div><div class="lb-xp2">510 XP</div><button class="duel-chip" onclick="openModal('mDuel')">⚔️ Дуэль</button></div>
+  <div class="lb-item me"><div class="lb-rank">12</div><div class="lb-av" id="lbAv">А</div><div class="lb-info"><div class="lb-name" id="lbN">Алекс (Ты)</div><div class="lb-streak" id="lbStr">🔥 1 дн.</div></div><div class="lb-xp2" id="lbX">10 XP</div><div>👑</div></div>
+  <div class="lb-item"><div class="lb-rank">13</div><div class="lb-av" style="background:linear-gradient(135deg,#10b981,#3b82f6);">V</div><div class="lb-info"><div class="lb-name">Victor_G</div><div class="lb-streak">🔥 3 дн.</div></div><div class="lb-xp2">8 XP</div><button class="duel-chip" onclick="openModal('mDuel')">⚔️ Дуэль</button></div>
+</div>
+
+<!-- S10 GOALS -->
+<div class="screen" id="s10" style="justify-content:flex-start;padding-bottom:88px;gap:10px;">
+  <div class="shead"><div style="font-family:'Unbounded',sans-serif;font-size:17px;font-weight:800;">🎯 Мои цели</div></div>
+  <div id="goalsList" style="width:100%;display:flex;flex-direction:column;gap:10px;"></div>
+  <button class="add-dashed" onclick="openModal('mAddGoal')">＋ Добавить цель</button>
+</div>
+
+<!-- S11 TASKS -->
+<div class="screen" id="s11" style="justify-content:flex-start;padding-bottom:88px;gap:10px;">
+  <div class="shead"><div style="font-family:'Unbounded',sans-serif;font-size:17px;font-weight:800;">📋 Задачи</div></div>
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterTasks('all',this)">Все</button>
+    <button class="filter-tab" onclick="filterTasks('active',this)">Активные</button>
+    <button class="filter-tab" onclick="filterTasks('done',this)">Готово</button>
+  </div>
+  <div id="fullTaskList" style="width:100%;display:flex;flex-direction:column;gap:8px;"></div>
+  <button class="add-dashed" onclick="openModal('mAddTask')">＋ Добавить задачу</button>
+</div>
+
+<!-- S12 SETTINGS -->
+<div class="screen" id="s12" style="justify-content:flex-start;padding-bottom:88px;gap:12px;">
+  <div class="settings-av-wrap">
+    <div class="settings-av" id="sAv">А</div>
+    <div style="font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;" id="sUN">Алекс</div>
+    <div style="font-size:13px;color:var(--muted);" id="sLV">Уровень 1 · 10 XP</div>
+  </div>
+  <!-- Badges -->
+  <div class="slabel">Бейджики</div>
+  <div class="badge-row">
+    <div class="badge2 earned" onclick="showToast('🔥 Разблокировано!','7 дней подряд')"><div class="badge2-icon">🔥</div><div class="badge2-lbl">7 дней</div></div>
+    <div class="badge2" onclick="showToast('⚡ Нужно 30 дней','Продолжай!')"><div class="badge2-icon" style="filter:grayscale(1);opacity:0.35;">⚡</div><div class="badge2-lbl">30 дней</div></div>
+    <div class="badge2" onclick="showToast('🏆 Попади в Топ-10','Рейтинг')"><div class="badge2-icon" style="filter:grayscale(1);opacity:0.35;">🏆</div><div class="badge2-lbl">Топ-10</div></div>
+    <div class="badge2" onclick="showToast('⚔️ Выиграй дуэль','Сразись!')"><div class="badge2-icon" style="filter:grayscale(1);opacity:0.35;">⚔️</div><div class="badge2-lbl">Дуэлянт</div></div>
+  </div>
+  <!-- Notifs -->
+  <div class="slabel">Уведомления</div>
+  <div class="settings-item" onclick="toggleNotif('morning','tM')">
+    <div class="s-icon">🌅</div>
+    <div class="s-info"><div class="s-name">Утром — 08:00</div><div class="s-sub">Начни день с целей</div></div>
+    <div class="toggle on" id="tM"><div class="toggle-knob"></div></div>
+  </div>
+  <div class="settings-item" onclick="toggleNotif('noon','tN')">
+    <div class="s-icon">☀️</div>
+    <div class="s-info"><div class="s-name">Полдень — 13:00</div><div class="s-sub">Проверь прогресс</div></div>
+    <div class="toggle" id="tN"><div class="toggle-knob"></div></div>
+  </div>
+  <div class="settings-item" onclick="toggleNotif('evening','tE')">
+    <div class="s-icon">🌙</div>
+    <div class="s-info"><div class="s-name">Вечером — 21:00</div><div class="s-sub">Подведи итог дня</div></div>
+    <div class="toggle on" id="tE"><div class="toggle-knob"></div></div>
+  </div>
+  <!-- Account -->
+  <div class="slabel">Аккаунт</div>
+  <div class="settings-item" onclick="openModal('mEditProfile')">
+    <div class="s-icon">✏️</div>
+    <div class="s-info"><div class="s-name">Изменить профиль</div></div>
+    <div class="s-arrow">›</div>
+  </div>
+  <div class="settings-item" onclick="showToast('✅ Уже подписан!','@protocol2_app')">
+    <div class="s-icon">📣</div>
+    <div class="s-info"><div class="s-name">Telegram канал</div><div class="s-sub">@protocol2_app</div></div>
+    <div class="s-arrow">›</div>
+  </div>
+  <div class="settings-item" onclick="showToast('🔗 Ссылка скопирована!','+50 XP за друга')">
+    <div class="s-icon">🎁</div>
+    <div class="s-info"><div class="s-name">Пригласить друга</div><div class="s-sub">+50 XP за приглашение</div></div>
+    <div class="s-arrow">›</div>
+  </div>
+</div>
+
+<!-- S13 DUEL -->
+<div class="screen" id="s13" style="justify-content:flex-start;padding-bottom:88px;gap:14px;">
+  <div class="glow-orb" style="width:250px;height:250px;background:rgba(248,113,113,0.1);top:-80px;right:-80px;"></div>
+  <div class="shead">
+    <div class="back-btn" onclick="nav('s9');setActiveNav('s9');">←</div>
+    <div style="font-family:'Unbounded',sans-serif;font-size:17px;font-weight:800;">⚔️ Дуэль</div>
+  </div>
+  <div class="duel-vs">
+    <div class="duel-player">
+      <div class="duel-av" id="dAv">А</div>
+      <div style="font-size:14px;font-weight:700;" id="dName">Алекс</div>
+      <div style="font-size:12px;color:var(--muted);" id="dXp">10 XP</div>
+    </div>
+    <div class="vs-badge">VS</div>
+    <div class="duel-player">
+      <div class="duel-av enemy">А</div>
+      <div style="font-size:14px;font-weight:700;">Artem_Pro</div>
+      <div style="font-size:12px;color:var(--muted);">640 XP</div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Прогресс дуэли</div>
+    <div class="duel-bars" style="border-radius:6px;overflow:hidden;">
+      <div class="duel-bar-me" id="dBarMe" style="width:15%;border-radius:6px 0 0 6px;"></div>
+      <div class="duel-bar-enemy" style="border-radius:0 6px 6px 0;"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-top:4px;">
+      <span style="color:var(--accent2);" id="dPct">15%</span><span style="color:var(--red);">85%</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-top:10px;text-align:center;">Осталось 2 дня · Выполняй задачи!</div>
+  </div>
+  <div class="card">
+    <div style="font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;margin-bottom:12px;">Задачи дуэли</div>
+    <div class="duel-task-row" onclick="duelTask(this)"><div class="task-check" style="border-radius:50%;">1</div><div class="task-text" style="flex:1;">100 отжиманий</div><div class="task-xp">+20 XP</div></div>
+    <div class="duel-task-row" onclick="duelTask(this)"><div class="task-check" style="border-radius:50%;">2</div><div class="task-text" style="flex:1;">30 мин бега</div><div class="task-xp">+15 XP</div></div>
+    <div class="duel-task-row" onclick="duelTask(this)"><div class="task-check" style="border-radius:50%;">3</div><div class="task-text" style="flex:1;">Холодный душ</div><div class="task-xp">+10 XP</div></div>
+  </div>
+  <button class="btn btn-danger" onclick="showToast('😰 Ты сдался!','−50 XP штраф');nav('s9');setActiveNav('s9');">Сдаться (−50 XP)</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav" id="bottomNav">
+  <button class="nav-item" id="nav-s8" onclick="switchTab('s8')"><div class="nav-icon">🏠</div><div class="nav-label">Главная</div></button>
+  <button class="nav-item" id="nav-s9" onclick="switchTab('s9')"><div class="nav-icon">🏆</div><div class="nav-label">Топ</div></button>
+  <button class="nav-item" id="nav-s10" onclick="switchTab('s10')"><div class="nav-icon">🎯</div><div class="nav-label">Цели</div></button>
+  <button class="nav-item" id="nav-s11" onclick="switchTab('s11')"><div class="nav-icon">📋</div><div class="nav-label">Задачи</div></button>
+  <button class="nav-item" id="nav-s12" onclick="switchTab('s12')"><div class="nav-icon">⚙️</div><div class="nav-label">Настройки</div></button>
+</div>
+
+<!-- MODALS -->
+<div class="modal" id="mAddTask">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-close" onclick="closeModal('mAddTask')">✕</div>
+    <div class="modal-title">Новая задача</div>
+    <input class="input" id="newTaskName" type="text" placeholder="Название задачи" style="margin-bottom:12px;">
+    <div style="display:flex;gap:8px;margin-bottom:20px;">
+      <select class="input" id="newTaskSph" style="flex:1;padding:12px 14px;cursor:pointer;"></select>
+      <input class="input" id="newTaskXp" type="number" placeholder="XP" value="10" style="width:80px;padding:12px 14px;">
+    </div>
+    <button class="btn btn-primary" onclick="addTask()">Добавить задачу</button>
+  </div>
+</div>
+
+<div class="modal" id="mAddGoal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-close" onclick="closeModal('mAddGoal')">✕</div>
+    <div class="modal-title">Новая цель</div>
+    <select class="input" id="newGoalSph" style="margin-bottom:12px;cursor:pointer;"></select>
+    <input class="input" id="newGoalName" type="text" placeholder="Название цели" style="margin-bottom:20px;">
+    <button class="btn btn-primary" onclick="addGoal()">Создать цель</button>
+  </div>
+</div>
+
+<div class="modal" id="mDuel">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-close" onclick="closeModal('mDuel')">✕</div>
+    <div class="modal-title">⚔️ Вызов на дуэль</div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.6;">Дуэль длится 3 дня. Победитель забирает 50 XP у проигравшего. Выполняй задачи и побеждай!</div>
+    <div class="lb-item" style="margin-bottom:16px;">
+      <div class="lb-av">А</div>
+      <div class="lb-info"><div class="lb-name">Artem_Pro</div><div class="lb-streak">🔥 14 дней · 640 XP</div></div>
+    </div>
+    <button class="btn btn-primary" style="margin-bottom:10px;" onclick="startDuel()">⚔️ Принять вызов!</button>
+    <button class="btn btn-ghost" onclick="closeModal('mDuel')">Отмена</button>
+  </div>
+</div>
+
+<div class="modal" id="mEditProfile">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-close" onclick="closeModal('mEditProfile')">✕</div>
+    <div class="modal-title">Редактировать профиль</div>
+    <input class="input" id="editName" type="text" placeholder="Имя" style="margin-bottom:20px;">
+    <button class="btn btn-primary" onclick="saveProfile()">Сохранить</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-val" id="tVal">+10 XP</div>
+  <div class="toast-lbl" id="tLbl">Задача выполнена!</div>
+</div>
+
+<script>
+// ── STATE ──
+const SPHERES = ['Тело','Разум','Финансы','Образование','Дисциплина','Духовность','Отношения','Топ. жизнь'];
+const COLORS = { 'Тело':'#f97316','Разум':'#8b5cf6','Финансы':'#4ade80','Образование':'#60a5fa','Дисциплина':'#f59e0b','Духовность':'#a78bfa','Отношения':'#ec4899','Топ. жизнь':'#ef4444' };
+const RANKS = ['Новобранец','Ученик','Воин','Ветеран','Чемпион','Легенда'];
+
+let S = {
+  name:'Алекс', xp:10, level:1, streak:1,
+  spheres:['Финансы'],
+  goals:[
+    { sphere:'Финансы', name:'Накопить 100 000 ₽', progress:35 },
+    { sphere:'Тело', name:'Сбросить 5 кг', progress:20 }
+  ],
+  tasks:[
+    { name:'Утренняя зарядка 20 мин', sphere:'Тело', xp:10, done:false },
+    { name:'Прочитать 20 страниц', sphere:'Образование', xp:10, done:false },
+    { name:'30 подтягиваний', sphere:'Тело', xp:15, done:false },
+  ],
+  goalIdx:0,
+  duelProgress:15
+};
+
+// ── NAVIGATION ──
+const APP_SCREENS = ['s8','s9','s10','s11','s12','s13'];
+
+function nav(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const bn = document.getElementById('bottomNav');
+  bn.style.display = APP_SCREENS.includes(id) ? 'flex' : 'none';
+}
+
+function setActiveNav(id) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('nav-' + id);
+  if(el) el.classList.add('active');
+}
+
+function switchTab(id) {
+  nav(id);
+  setActiveNav(id);
+  if(id === 's10') renderGoals();
+  if(id === 's11') renderFullTasks('all');
+  if(id === 's12') refreshSettings();
+}
+
+// ── ONBOARDING ──
+function saveName() {
+  const v = document.getElementById('nameInput').value.trim();
+  if(v) S.name = v;
+  nav('s3');
+}
+
+function toggleSphere(btn) { btn.classList.toggle('sel'); }
+
+function saveSpheres() {
+  S.spheres = [...document.querySelectorAll('#sphereGrid .sphere-btn.sel')].map(b => b.dataset.s);
+  if(!S.spheres.length) { showToast('⚠️ Выбери сферу','хотя бы одну'); return; }
+  S.goalIdx = 0;
+  showGoalStep();
+}
+
+function showGoalStep() {
+  if(S.goalIdx >= S.spheres.length) { nav('s6'); return; }
+  document.getElementById('goalStep').textContent = `Шаг ${S.goalIdx+1} из ${S.spheres.length}`;
+  const sph = S.spheres[S.goalIdx];
+  document.getElementById('goalSphLabel').textContent = 'Сфера: ' + sph;
+  document.getElementById('goalSphLabel').style.color = COLORS[sph] || 'var(--accent2)';
+  document.getElementById('goalInput').value = '';
+  nav('s5');
+}
+
+function saveGoal() {
+  const v = document.getElementById('goalInput').value.trim();
+  if(v) S.goals.push({ sphere:S.spheres[S.goalIdx], name:v, progress:0 });
+  S.goalIdx++;
+  showGoalStep();
+}
+
+function saveFirstTask() {
+  const v = document.getElementById('taskInput').value.trim();
+  if(v) S.tasks.unshift({ name:v, sphere:S.spheres[0]||'Тело', xp:10, done:false });
+  nav('s7');
+}
+
+function goToApp() {
+  nav('s8');
+  setActiveNav('s8');
+  updateAll();
+  renderTasks();
+}
+
+// ── DATA UPDATE ──
+function updateAll() {
+  const needed = S.level * 100;
+  const pct = Math.min((S.xp / needed) * 100, 100);
+  safeSet('xpFill', el => el.style.width = pct + '%');
+  safeSet('xpLabel', el => el.textContent = S.xp + ' XP');
+  safeSet('xpMax', el => el.textContent = `до Ур.${S.level+1}: ${needed - S.xp} XP`);
+  safeSet('lvBadge', el => el.textContent = 'Уровень ' + S.level);
+  safeSet('rankTitle', el => el.textContent = RANKS[Math.min(S.level-1, RANKS.length-1)]);
+  safeSet('statS', el => el.textContent = '🔥 ' + S.streak);
+  const done = S.tasks.filter(t=>t.done).length;
+  safeSet('statD', el => el.textContent = `${done}/${S.tasks.length}`);
+  // update leaderboard refs
+  safeSet('lbX', el => el.textContent = S.xp + ' XP');
+  safeSet('lbStr', el => el.textContent = '🔥 ' + S.streak + ' дн.');
+  // update settings
+  safeSet('sAv', el => el.textContent = S.name[0].toUpperCase());
+  safeSet('sUN', el => el.textContent = S.name);
+  safeSet('sLV', el => el.textContent = `Уровень ${S.level} · ${S.xp} XP`);
+  // update profile avatar etc
+  ['av','lbAv','dAv','sAv'].forEach(id => safeSet(id, el => el.textContent = S.name[0].toUpperCase()));
+  ['dn','lbN','dName'].forEach(id => {
+    safeSet(id, el => el.textContent = id==='lbN' ? S.name+' (Ты)' : S.name);
+  });
+  safeSet('dXp', el => el.textContent = S.xp + ' XP');
+
+  if(S.xp >= S.level * 100) {
+    S.level++; S.xp = 0;
+    showToast('🎉 ЛЕВЕЛ АП!', `Уровень ${S.level} получен!`);
+    updateAll();
+  }
+}
+
+function safeSet(id, fn) { const el = document.getElementById(id); if(el) fn(el); }
+
+function gainXP(amount, label) {
+  S.xp += amount;
+  updateAll();
+  renderTasks();
+  showToast('+' + amount + ' XP', label);
+}
+
+// ── TASKS ──
+function renderTasks() {
+  const list = document.getElementById('taskList');
+  if(!list) return;
+  list.innerHTML = '';
+  S.tasks.slice(0,5).forEach((t, i) => {
+    const row = document.createElement('div');
+    row.className = 'task-row';
+    row.innerHTML = `<div class="task-check${t.done?' done':''}">${t.done?'✓':(i+1)}</div><div class="task-text${t.done?' done':''}">${t.name}</div><div class="task-xp">+${t.xp} XP</div>`;
+    row.onclick = () => {
+      if(!t.done){ t.done=true; gainXP(t.xp,'✅ Выполнено!'); }
+      else { t.done=false; S.xp=Math.max(0,S.xp-t.xp); updateAll(); renderTasks(); }
+    };
+    list.appendChild(row);
+  });
+}
+
+function completeAll() {
+  let gained = 0;
+  S.tasks.forEach(t => { if(!t.done){ t.done=true; gained+=t.xp; } });
+  renderTasks();
+  if(gained > 0) gainXP(0, '🎉 Все задачи выполнены!');  // xp already added
+  else showToast('✅ Уже всё готово!','Молодец!');
+  // add actual XP
+  S.xp += gained; updateAll(); renderTasks();
+}
+
+function renderFullTasks(filter) {
+  const list = document.getElementById('fullTaskList');
+  if(!list) return;
+  list.innerHTML = '';
+  S.tasks
+    .filter(t => filter==='all'||(filter==='active'&&!t.done)||(filter==='done'&&t.done))
+    .forEach(t => {
+      const color = COLORS[t.sphere]||'#7B6EF6';
+      const row = document.createElement('div');
+      row.className = 'task-full-row';
+      row.innerHTML = `
+        <div class="task-sphere-dot" style="background:${color};"></div>
+        <div class="task-full-info">
+          <div class="task-full-name" style="${t.done?'text-decoration:line-through;opacity:0.5;':''}">${t.name}</div>
+          <div class="task-full-sub">${t.sphere} · +${t.xp} XP</div>
+        </div>
+        <div class="task-full-check${t.done?' done':''}">${t.done?'✓':''}</div>`;
+      row.onclick = () => {
+        if(!t.done){ t.done=true; gainXP(t.xp,'✅ Выполнено!'); }
+        else { t.done=false; S.xp=Math.max(0,S.xp-t.xp); updateAll(); }
+        renderFullTasks(filter); renderTasks();
+      };
+      list.appendChild(row);
+    });
+}
+
+function filterTasks(f, btn) {
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderFullTasks(f);
+}
+
+function addTask() {
+  const name = document.getElementById('newTaskName').value.trim();
+  const sphere = document.getElementById('newTaskSph').value;
+  const xp = parseInt(document.getElementById('newTaskXp').value)||10;
+  if(!name){ showToast('⚠️','Введи название'); return; }
+  S.tasks.unshift({ name, sphere, xp, done:false });
+  document.getElementById('newTaskName').value = '';
+  closeModal('mAddTask');
+  renderTasks(); renderFullTasks('all');
+  showToast('✅ Задача добавлена', name);
+}
+
+// ── GOALS ──
+function renderGoals() {
+  const list = document.getElementById('goalsList');
+  if(!list) return;
+  list.innerHTML = '';
+  S.goals.forEach((g,i) => {
+    const color = COLORS[g.sphere]||'#7B6EF6';
+    const el = document.createElement('div');
+    el.className = 'goal-item';
+    el.innerHTML = `
+      <div class="goal-sphere-tag" style="color:${color};">${g.sphere}</div>
+      <div class="goal-name2">${g.name}</div>
+      <div class="goal-prog-bg"><div class="goal-prog-fill" style="width:${g.progress}%;background:linear-gradient(90deg,${color},${color}99);"></div></div>
+      <div class="goal-prog-lbl">${g.progress}% выполнено</div>`;
+    el.onclick = () => { g.progress = Math.min(100, g.progress+10); renderGoals(); showToast('📈 Прогресс!', `${g.progress}% — ${g.name}`); };
+    list.appendChild(el);
+  });
+}
+
+function addGoal() {
+  const sphere = document.getElementById('newGoalSph').value;
+  const name = document.getElementById('newGoalName').value.trim();
+  if(!name){ showToast('⚠️','Введи название цели'); return; }
+  S.goals.push({ sphere, name, progress:0 });
+  document.getElementById('newGoalName').value = '';
+  closeModal('mAddGoal');
+  renderGoals();
+  showToast('🎯 Цель добавлена', name);
+}
+
+// ── SETTINGS ──
+function refreshSettings() {
+  safeSet('sAv', el => el.textContent = S.name[0].toUpperCase());
+  safeSet('sUN', el => el.textContent = S.name);
+  safeSet('sLV', el => el.textContent = `Уровень ${S.level} · ${S.xp} XP`);
+}
+
+function toggleNotif(name, id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('on');
+  const on = el.classList.contains('on');
+  const times = { morning:'08:00', noon:'13:00', evening:'21:00' };
+  showToast(on ? '🔔 Включено' : '🔕 Выключено', times[name] || '');
+}
+
+function saveProfile() {
+  const v = document.getElementById('editName').value.trim();
+  if(v){ S.name = v; updateAll(); refreshSettings(); }
+  closeModal('mEditProfile');
+  showToast('✅ Профиль сохранён','');
+}
+
+// ── DUEL ──
+function startDuel() {
+  closeModal('mDuel');
+  nav('s13');
+  setActiveNav('s9');
+  safeSet('dAv', el => el.textContent = S.name[0].toUpperCase());
+  safeSet('dName', el => el.textContent = S.name);
+  safeSet('dXp', el => el.textContent = S.xp + ' XP');
+  S.duelProgress = 15;
+  updateDuelBar();
+}
+
+function duelTask(row) {
+  const ch = row.querySelector('.task-check');
+  const tx = row.querySelector('.task-text');
+  const xpEl = row.querySelector('.task-xp');
+  if(!ch.classList.contains('done')) {
+    ch.classList.add('done'); ch.textContent = '✓';
+    tx.classList.add('done');
+    const earned = parseInt(xpEl.textContent) || 15;
+    S.duelProgress = Math.min(75, S.duelProgress + 18);
+    updateDuelBar();
+    gainXP(earned, '⚔️ Дуэльное задание!');
+  }
+}
+
+function updateDuelBar() {
+  safeSet('dBarMe', el => { el.style.width = S.duelProgress + '%'; });
+  safeSet('dPct', el => el.textContent = S.duelProgress + '%');
+}
+
+// ── MODALS ──
+function openModal(id) {
+  // populate selects
+  ['newTaskSph','newGoalSph'].forEach(sid => {
+    const sel = document.getElementById(sid);
+    if(sel && sel.options.length === 0) {
+      SPHERES.forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
+    }
+  });
+  if(id === 'mEditProfile') safeSet('editName', el => el.value = S.name);
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal').forEach(m => {
+  m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); });
+});
+
+// ── TOAST ──
+function showToast(val, lbl) {
+  safeSet('tVal', el => el.textContent = val);
+  safeSet('tLbl', el => el.textContent = lbl);
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── RIPPLE ──
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn');
+  if(!btn) return;
+  const r = document.createElement('span');
+  r.className = 'ripple';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;`;
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 500);
+});
+
+// ── INIT ──
+(function() {
+  SPHERES.forEach(s => {
+    ['newTaskSph','newGoalSph'].forEach(sid => {
+      const sel = document.getElementById(sid);
+      if(sel) { const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); }
+    });
+  });
+})();
+</script>
+</div>
+</body>
+</html>
