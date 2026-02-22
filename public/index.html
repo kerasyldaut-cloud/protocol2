@@ -1,73 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Protocol</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>PROTOCOL 2.0</title>
+
 <style>
-body{font-family:sans-serif;background:#0f1220;color:white;text-align:center;padding:40px}
-button{padding:15px 25px;margin:10px;font-size:16px;border-radius:12px;border:none;background:#6c5ce7;color:white}
+body{
+background:#0b0f1f;
+font-family:Arial;
+color:white;
+text-align:center;
+padding:20px;
+}
+h1{color:#8b5cf6;}
+.card{
+background:#11162a;
+padding:20px;
+border-radius:20px;
+margin:10px auto;
+width:90%;
+max-width:420px;
+}
+button{
+background:linear-gradient(45deg,#8b5cf6,#6366f1);
+border:none;
+padding:12px 20px;
+border-radius:12px;
+color:white;
+font-size:16px;
+margin-top:10px;
+}
+input{
+padding:10px;
+border-radius:10px;
+border:none;
+width:80%;
+margin-top:10px;
+}
+.progress{
+height:10px;
+background:#222;
+border-radius:10px;
+margin-top:10px;
+}
+.bar{
+height:10px;
+background:#8b5cf6;
+border-radius:10px;
+width:0%;
+}
 </style>
 </head>
+
 <body>
 
-<h2>PROTOCOL 2.0</h2>
-<div id="info">Загрузка...</div>
+<h1>PROTOCOL 2.0</h1>
+<div id="user"></div>
 
-<input id="goalInput" placeholder="Новая цель"/>
+<div class="card">
+<h3>XP и уровень</h3>
+<div id="level"></div>
+<div class="progress"><div class="bar" id="xpbar"></div></div>
+</div>
+
+<div class="card">
+<h3>Новая цель</h3>
+<input id="goalInput" placeholder="Введите цель">
+<br>
 <button onclick="addGoal()">Добавить цель</button>
-
 <ul id="goals"></ul>
+</div>
 
 <script>
 const tg = window.Telegram?.WebApp;
 tg?.expand?.();
 
-let USER_ID = tg?.initDataUnsafe?.user?.id 
-  ? String(tg.initDataUnsafe.user.id)
-  : localStorage.getItem("uid") || (()=>{let r="u"+Math.random();localStorage.setItem("uid",r);return r})();
+const USER_ID = tg?.initDataUnsafe?.user?.id 
+? String(tg.initDataUnsafe.user.id) 
+: "demo";
 
-const API = window.location.origin;
+const API="https://protocol20.onrender.com";
 
-let state = { goals: [] };
+let user={xp:0,level:1};
+let goals=[];
 
-async function api(path,method="GET",body=null){
- const res = await fetch(path,{
-  method,
-  headers:{'Content-Type':'application/json'},
-  body:body?JSON.stringify(body):null
- });
- return res.json();
+async function api(url,method="GET",data){
+const res=await fetch(API+url,{
+method,
+headers:{'Content-Type':'application/json'},
+body:data?JSON.stringify(data):undefined
+});
+return res.json();
 }
 
 async function load(){
- await api('/api/user','POST',{id:USER_ID,name:"User"});
- const goals = await api('/api/goals/'+USER_ID);
- state.goals = goals||[];
- render();
+try{
+const u = await api('/api/user/'+USER_ID);
+if(u){
+user=u;
+document.getElementById("level").innerText=
+"Level "+(user.level||1)+" | XP "+(user.xp||0);
+document.getElementById("xpbar").style.width=
+((user.xp||0)/((user.level||1)*100))*100+"%";
 }
 
-function render(){
- document.getElementById("info").innerText="User: "+USER_ID;
- const ul=document.getElementById("goals");
- ul.innerHTML="";
- state.goals.forEach(g=>{
-   const li=document.createElement("li");
-   li.innerText=g.name;
-   ul.appendChild(li);
- });
+const g = await api('/api/goals/'+USER_ID);
+goals=g||[];
+renderGoals();
+
+}catch(e){console.log(e);}
+}
+
+function renderGoals(){
+const ul=document.getElementById("goals");
+ul.innerHTML="";
+goals.forEach(g=>{
+const li=document.createElement("li");
+li.innerText=g.name+" ("+(g.progress||0)+"%)";
+ul.appendChild(li);
+});
 }
 
 async function addGoal(){
- const name=document.getElementById("goalInput").value.trim();
- if(!name)return;
- await api('/api/goals/'+USER_ID,'POST',{name,sphere:"life"});
- document.getElementById("goalInput").value="";
- load();
+const name=document.getElementById("goalInput").value;
+if(!name) return;
+
+await api('/api/goals/'+USER_ID,'POST',{
+sphere:"life",
+name:name
+});
+
+document.getElementById("goalInput").value="";
+load();
 }
 
-window.onload=load;
+load();
 </script>
 </body>
 </html>
