@@ -667,10 +667,6 @@ async function initUserFromServer() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initUserFromServer();
-});
-
 // ── STATE ──
 const SPHERES = ['Тело','Разум','Финансы','Образование','Дисциплина','Духовность','Отношения','Топ. жизнь'];
 const COLORS = { 'Тело':'#f97316','Разум':'#8b5cf6','Финансы':'#4ade80','Образование':'#60a5fa','Дисциплина':'#f59e0b','Духовность':'#a78bfa','Отношения':'#ec4899','Топ. жизнь':'#ef4444' };
@@ -691,6 +687,10 @@ let S = {
   goalIdx:0,
   duelProgress:15
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+  initUserFromServer();
+});
 
 // ── NAVIGATION ──
 const APP_SCREENS = ['s8','s9','s10','s11','s12','s13'];
