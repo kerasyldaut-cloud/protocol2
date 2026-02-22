@@ -4,8 +4,11 @@
 <meta charset="UTF-8">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-  window.Telegram.WebApp.expand();
-  const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+  // Safe Telegram init: doesn't crash if opened outside Telegram
+  const tg = window.Telegram?.WebApp;
+  tg?.expand?.();
+
+  const tgUser = tg?.initDataUnsafe?.user;
   const USER_ID = tgUser?.id ? String(tgUser.id) : 'demo';
   const API = window.location.origin;
 </script>
@@ -606,6 +609,68 @@ body {
 </div>
 
 <script>
+// ===== Runtime safety =====
+window.addEventListener('error', (e) => {
+  console.log('JS error:', e.message);
+  try { showToast('Ошибка JS', e.message); } catch (_) {}
+});
+
+// ===== API helper =====
+async function api(path, method = 'GET', body = null) {
+  const res = await fetch(path, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : null
+  });
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { return { raw: text, status: res.status }; }
+}
+
+// ===== Load user + data from server =====
+async function initUserFromServer() {
+  try {
+    await api('/api/user', 'POST', { id: USER_ID, name: S.name });
+
+    const user = await api('/api/user/' + USER_ID);
+    if (user && !user.error) {
+      S.name = user.name || S.name;
+      S.xp = (user.xp ?? S.xp);
+      S.level = (user.level ?? S.level);
+      S.streak = (user.streak ?? S.streak);
+    }
+
+    const tasks = await api('/api/tasks/' + USER_ID);
+    if (Array.isArray(tasks)) {
+      S.tasks = tasks.map(t => ({
+        id: t.id,
+        name: t.name,
+        sphere: t.sphere,
+        xp: t.xp ?? 10,
+        done: !!t.done
+      }));
+    }
+
+    const goals = await api('/api/goals/' + USER_ID);
+    if (Array.isArray(goals)) {
+      S.goals = goals.map(g => ({
+        id: g.id,
+        sphere: g.sphere,
+        name: g.name,
+        progress: g.progress ?? 0
+      }));
+    }
+
+    updateAll();
+    renderTasks();
+  } catch (e) {
+    console.log('initUserFromServer failed:', e);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initUserFromServer();
+});
+
 // ── STATE ──
 const SPHERES = ['Тело','Разум','Финансы','Образование','Дисциплина','Духовность','Отношения','Топ. жизнь'];
 const COLORS = { 'Тело':'#f97316','Разум':'#8b5cf6','Финансы':'#4ade80','Образование':'#60a5fa','Дисциплина':'#f59e0b','Духовность':'#a78bfa','Отношения':'#ec4899','Топ. жизнь':'#ef4444' };
@@ -737,11 +802,11 @@ function gainXP(amount, label) {
   updateAll();
   renderTasks();
   showToast('+' + amount + ' XP', label);
-  
-  api("/api/xp", "POST", {
-  telegram_id: USER_ID,
-  xp: amount
-});
+
+  // Persist XP to backend (best-effort)
+  api('/api/user/' + USER_ID + '/xp', 'POST', { amount })
+    .catch(() => {});
+}
 
 // ── TASKS ──
 function renderTasks() {
@@ -808,6 +873,14 @@ function addTask() {
   const xp = parseInt(document.getElementById('newTaskXp').value)||10;
   if(!name){ showToast('⚠️','Введи название'); return; }
   S.tasks.unshift({ name, sphere, xp, done:false });
+  // save to server and refresh list
+  api('/api/tasks/' + USER_ID, 'POST', { name, sphere, xp })
+    .then(() => api('/api/tasks/' + USER_ID))
+    .then((tasks) => { if (Array.isArray(tasks)) {
+      S.tasks = tasks.map(t => ({ id:t.id, name:t.name, sphere:t.sphere, xp:t.xp ?? 10, done:!!t.done }));
+      renderTasks(); renderFullTasks('all'); updateAll();
+    } })
+    .catch(() => {});
   document.getElementById('newTaskName').value = '';
   closeModal('mAddTask');
   renderTasks(); renderFullTasks('all');
@@ -838,6 +911,14 @@ function addGoal() {
   const name = document.getElementById('newGoalName').value.trim();
   if(!name){ showToast('⚠️','Введи название цели'); return; }
   S.goals.push({ sphere, name, progress:0 });
+  // save to server and refresh list
+  api('/api/goals/' + USER_ID, 'POST', { sphere, name })
+    .then(() => api('/api/goals/' + USER_ID))
+    .then((goals) => { if (Array.isArray(goals)) {
+      S.goals = goals.map(g => ({ id:g.id, sphere:g.sphere, name:g.name, progress:g.progress ?? 0 }));
+      renderGoals(); updateAll();
+    } })
+    .catch(() => {});
   document.getElementById('newGoalName').value = '';
   closeModal('mAddGoal');
   renderGoals();
