@@ -737,7 +737,11 @@ function gainXP(amount, label) {
   updateAll();
   renderTasks();
   showToast('+' + amount + ' XP', label);
-}
+  
+  api("/api/xp", "POST", {
+  telegram_id: USER_ID,
+  xp: amount
+});
 
 // ── TASKS ──
 function renderTasks() {
@@ -942,6 +946,41 @@ document.addEventListener('click', e => {
     });
   });
 })();
+
+// ===== API =====
+async function api(path, method = "GET", body = null) {
+  const res = await fetch(API + path, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : null
+  });
+
+  return await res.json();
+}
+
+// ===== INIT USER =====
+async function initUser() {
+  if (!USER_ID) return;
+
+  // создаём если нет
+  await api("/api/user", "POST", {
+    telegram_id: USER_ID,
+    name: S.name
+  });
+
+  // получаем данные
+  const data = await api("/api/user/" + USER_ID);
+
+  if (data) {
+    S.xp = data.xp;
+    S.level = data.level;
+    S.streak = data.streak;
+    updateAll();
+  }
+}
+
+document.addEventListener("DOMContentLoaded", initUser);
+
 </script>
 </div>
 </body>
