@@ -36,6 +36,17 @@ bot.onText(/\/top/, async (msg) => {
   bot.sendMessage(msg.chat.id, text, { parse_mode: 'Markdown' });
 });
 
+app.post('/api/user', async (req, res) => {
+  const { id, name, age } = req.body;
+  if (!id) return res.status(400).json({ error: 'id required' });
+
+  const existing = await db.getUser(id);
+  if (existing) return res.json(existing);
+
+  const user = await db.createUser(id, name || 'User', age || null);
+  res.json(user);
+});
+
 app.get('/api/user/:id', async (req, res) => {
   const user = await db.getUser(req.params.id);
   if (!user) return res.status(404).json({ error: 'Not found' });

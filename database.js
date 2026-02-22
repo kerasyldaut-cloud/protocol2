@@ -1,6 +1,45 @@
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
+async function getUser(id) {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('telegram_id', id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('getUser error:', error.message);
+    return null;
+  }
+  return data;
+}
+
+async function createUser(id, name, age) {
+  const payload = {
+    telegram_id: id,
+    name: name || 'User',
+    age: age ?? null,
+    xp: 0,
+    level: 1,
+    streak: 0
+  };
+
+  const { data, error } = await supabase
+    .from('users')
+    .insert(payload)
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error('createUser error:', error.message);
+    return null;
+  }
+  return data;
+}
+
+module.exports = { getUser, createUser /* + остальное что у тебя уже экспортируется */ };
+
 const getUser = async (telegram_id) => {
   const { data } = await supabase.from('users').select('*').eq('telegram_id', telegram_id).single();
   return data;
