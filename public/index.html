@@ -5,22 +5,27 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
 const tg = window.Telegram?.WebApp;
+tg?.ready?.();
 tg?.expand?.();
 
-let USER_ID = "demo";
-if (tg?.initDataUnsafe?.user?.id){
-  USER_ID = String(tg.initDataUnsafe.user.id);
+// Use Telegram user id when available. If not, we keep a stable local id,
+// but we also show a visible warning because saving won't match Telegram accounts.
+let USER_ID = null;
+const tgUser = tg?.initDataUnsafe?.user;
+if (tgUser?.id) {
+  USER_ID = String(tgUser.id);
 } else {
+  // Telegram WebView sometimes doesn't persist localStorage; still better than random each refresh
   let local = localStorage.getItem("proto_uid");
-  if(!local){
-    local = "u" + Math.floor(Math.random()*999999999);
+  if (!local) {
+    local = "u" + Math.floor(Math.random() * 999999999);
     localStorage.setItem("proto_uid", local);
   }
   USER_ID = local;
+  console.log("WARN: Telegram user id not available, using local USER_ID:", USER_ID);
 }
 
 const API = window.location.origin;
-console.log("USER_ID:", USER_ID);
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>PROTOCOL 2.0</title>
@@ -619,46 +624,95 @@ body {
 </div>
 
 <script>
-// ===== API helper =====
-async function api(path, method="GET", body=null){
-  const res = await fetch(path,{
+// ===== Runtime safety (prevents "everything resets") =====
+window.addEventListener('error', (e) => {
+  console.log('JS error:', e.message);
+  // showToast may not exist yet
+  try { showToast('Ошибка JS', e.message); } catch (_) {}
+});
+
+// ===== API helper (throws on non-2xx so we don't silently fail) =====
+async function api(path, method = "GET", body = null) {
+  const res = await fetch(path, {
     method,
-    headers:{'Content-Type':'application/json'},
-    body: body?JSON.stringify(body):null
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : null
   });
-  const t = await res.text();
-  try{return JSON.parse(t);}catch{return t;}
+
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch { data = { raw: text }; }
+
+  if (!res.ok) {
+    const msg = (data && (data.error || data.message)) ? (data.error || data.message) : ("HTTP " + res.status);
+    throw new Error(msg);
+  }
+  return data;
 }
 
-// ===== load from server =====
-async function initUserFromServer(){
- try{
-   await api('/api/user','POST',{id:USER_ID,name:S.name||'User'});
-   const user = await api('/api/user/'+USER_ID);
-   if(user && !user.error){
-     S.name=user.name||S.name;
-     S.xp=user.xp||0;
-     S.level=user.level||1;
-     S.streak=user.streak||0;
-   }
-
-   const goals = await api('/api/goals/'+USER_ID);
-   if(Array.isArray(goals)){
-     S.goals = goals.map(g=>({id:g.id,sphere:g.sphere,name:g.name,progress:g.progress||0}));
-   }
-
-   const tasks = await api('/api/tasks/'+USER_ID);
-   if(Array.isArray(tasks)){
-     S.tasks = tasks.map(t=>({id:t.id,name:t.name,sphere:t.sphere,xp:t.xp||10,done:!!t.done}));
-   }
-
-   updateAll();
-   renderGoals?.();
-   renderTasks?.();
- }catch(e){console.log("init err",e);}
+async function refreshGoalsFromServer() {
+  try {
+    const goals = await api('/api/goals/' + USER_ID);
+    if (Array.isArray(goals)) {
+      S.goals = goals.map(g => ({
+        id: g.id,
+        sphere: g.sphere,
+        name: g.name,
+        progress: g.progress || 0
+      }));
+      renderGoals();
+      updateAll();
+    }
+  } catch (e) {
+    console.log('refreshGoals error:', e.message);
+  }
 }
-document.addEventListener('DOMContentLoaded',()=>setTimeout(initUserFromServer,500));
 
+async function initUserFromServer() {
+  try {
+    // create if missing
+    await api('/api/user', 'POST', { id: USER_ID, name: S.name || 'User' });
+
+    const user = await api('/api/user/' + USER_ID);
+    if (user && !user.error) {
+      S.name = user.name || S.name;
+      S.xp = user.xp ?? 0;
+      S.level = user.level ?? 1;
+      S.streak = user.streak ?? 0;
+    }
+
+    // load tasks/goals
+    const tasks = await api('/api/tasks/' + USER_ID);
+    if (Array.isArray(tasks)) {
+      S.tasks = tasks.map(t => ({
+        id: t.id,
+        name: t.name,
+        sphere: t.sphere,
+        xp: t.xp ?? 10,
+        done: !!t.done
+      }));
+    }
+
+    const goals = await api('/api/goals/' + USER_ID);
+    if (Array.isArray(goals)) {
+      S.goals = goals.map(g => ({
+        id: g.id,
+        sphere: g.sphere,
+        name: g.name,
+        progress: g.progress || 0
+      }));
+    }
+
+    updateAll();
+    renderTasks();
+    renderGoals();
+  } catch (e) {
+    console.log('initUserFromServer error:', e.message);
+    try { showToast('Ошибка сервера', e.message); } catch (_) {}
+  }
+}
+
+// We'll start init AFTER state exists (see below)
 // ── STATE ──
 const SPHERES = ['Тело','Разум','Финансы','Образование','Дисциплина','Духовность','Отношения','Топ. жизнь'];
 const COLORS = { 'Тело':'#f97316','Разум':'#8b5cf6','Финансы':'#4ade80','Образование':'#60a5fa','Дисциплина':'#f59e0b','Духовность':'#a78bfa','Отношения':'#ec4899','Топ. жизнь':'#ef4444' };
@@ -679,6 +733,12 @@ let S = {
   goalIdx:0,
   duelProgress:15
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Small delay lets Telegram WebView settle
+  setTimeout(initUserFromServer, 150);
+});
+
 
 // ── NAVIGATION ──
 const APP_SCREENS = ['s8','s9','s10','s11','s12','s13'];
@@ -785,12 +845,14 @@ function updateAll() {
 
 function safeSet(id, fn) { const el = document.getElementById(id); if(el) fn(el); }
 
-function gainXP(amount,label){
-  S.xp+=amount;
+function gainXP(amount, label) {
+  S.xp += amount;
   updateAll();
   renderTasks();
-  showToast('+'+amount+' XP',label);
-  api('/api/user/'+USER_ID+'/xp','POST',{amount}).catch(()=>{});
+  showToast('+' + amount + ' XP', label);
+
+  api('/api/user/' + USER_ID + '/xp', 'POST', { amount })
+    .catch((e) => { console.log('xp save error:', e.message); });
 }
 
 // ── TASKS ──
@@ -852,18 +914,16 @@ function filterTasks(f, btn) {
   renderFullTasks(f);
 }
 
-function addTask(){
-  const name=document.getElementById('taskInput')?.value?.trim();
-  if(!name)return;
-  const sphere=document.getElementById('taskSphere')?.value||'life';
-  const xp=10;
-
-  S.tasks.unshift({id:Date.now(),name,sphere,xp,done:false});
-  renderTasks();
-  updateAll();
-  document.getElementById('taskInput').value='';
-
-  api('/api/tasks/'+USER_ID,'POST',{name,sphere,xp}).catch(()=>{});
+function addTask() {
+  const name = document.getElementById('newTaskName').value.trim();
+  const sphere = document.getElementById('newTaskSph').value;
+  const xp = parseInt(document.getElementById('newTaskXp').value)||10;
+  if(!name){ showToast('⚠️','Введи название'); return; }
+  S.tasks.unshift({ name, sphere, xp, done:false });
+  document.getElementById('newTaskName').value = '';
+  closeModal('mAddTask');
+  renderTasks(); renderFullTasks('all');
+  showToast('✅ Задача добавлена', name);
 }
 
 // ── GOALS ──
@@ -885,17 +945,26 @@ function renderGoals() {
   });
 }
 
-function addGoal(){
-  const name=document.getElementById('goalInput')?.value?.trim();
-  if(!name)return;
-  const sphere=document.getElementById('goalSphere')?.value||'life';
+function addGoal() {
+  const nameEl = document.getElementById('goalInput');
+  const name = nameEl?.value?.trim();
+  if (!name) return;
 
-  S.goals.push({id:Date.now(),sphere,name,progress:0});
+  const sphereEl = document.getElementById('goalSphere');
+  const sphere = sphereEl?.value || 'life';
+
+  // optimistic UI
+  S.goals.push({ id: Date.now(), sphere, name, progress: 0 });
   renderGoals();
   updateAll();
-  document.getElementById('goalInput').value='';
+  if (nameEl) nameEl.value = '';
 
-  api('/api/goals/'+USER_ID,'POST',{sphere,name}).catch(()=>{});
+  api('/api/goals/' + USER_ID, 'POST', { sphere, name })
+    .then(() => refreshGoalsFromServer())
+    .catch((e) => { 
+      console.log('goal save error:', e.message);
+      try { showToast('Не сохранилось', e.message); } catch (_) {}
+    });
 }
 
 // ── SETTINGS ──
