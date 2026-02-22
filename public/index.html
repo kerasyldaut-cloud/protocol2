@@ -4,12 +4,25 @@
 <meta charset="UTF-8">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-  // Safe Telegram init: doesn't crash if opened outside Telegram
   const tg = window.Telegram?.WebApp;
   tg?.expand?.();
+  tg?.ready?.();
 
   const tgUser = tg?.initDataUnsafe?.user;
-  const USER_ID = tgUser?.id ? String(tgUser.id) : 'demo';
+  const TG_NAME = tgUser?.first_name || tgUser?.username || 'User';
+
+  let USER_ID = tgUser?.id ? String(tgUser.id) : 'demo';
+
+  // If opened outside Telegram, keep a stable local id so it doesn't reset every refresh
+  if (USER_ID === 'demo') {
+    let local = localStorage.getItem('proto_uid');
+    if (!local) {
+      local = 'u' + Math.floor(Math.random() * 1e12);
+      localStorage.setItem('proto_uid', local);
+    }
+    USER_ID = local;
+  }
+
   const API = window.location.origin;
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -609,13 +622,42 @@ body {
 </div>
 
 <script>
-// ===== Runtime safety =====
-window.addEventListener('error', (e) => {
-  console.log('JS error:', e.message);
-  try { showToast('Ошибка JS', e.message); } catch (_) {}
-});
+// ── STATE ──
+const SPHERES = ['Тело','Разум','Финансы','Образование','Дисциплина','Духовность','Отношения','Топ. жизнь'];
+const COLORS = { 'Тело':'#f97316','Разум':'#8b5cf6','Финансы':'#4ade80','Образование':'#60a5fa','Дисциплина':'#f59e0b','Духовность':'#a78bfa','Отношения':'#ec4899','Топ. жизнь':'#ef4444' };
+const RANKS = ['Новобранец','Ученик','Воин','Ветеран','Чемпион','Легенда'];
 
-// ===== API helper =====
+let S = {
+  name: '',
+  xp: 0,
+  level: 1,
+  streak: 0,
+  spheres: [],
+  goals: [],   // {id, sphere, name, progress}
+  tasks: [],   // {id, name, sphere, xp, done}
+  goalIdx: 0,
+  duelProgress: 0
+};
+
+// local prefs (so onboarding choices don't vanish if API is slow)
+try {
+  const saved = JSON.parse(localStorage.getItem('proto_state') || 'null');
+  if (saved && typeof saved === 'object') {
+    if (typeof saved.name === 'string') S.name = saved.name;
+    if (Array.isArray(saved.spheres)) S.spheres = saved.spheres;
+  }
+} catch (_) {}
+
+function saveLocal() {
+  try {
+    localStorage.setItem('proto_state', JSON.stringify({
+      name: S.name,
+      spheres: S.spheres
+    }));
+  } catch (_) {}
+}
+
+// ===== API helper (server) =====
 async function api(path, method = 'GET', body = null) {
   const res = await fetch(path, {
     method,
@@ -626,71 +668,63 @@ async function api(path, method = 'GET', body = null) {
   try { return JSON.parse(text); } catch { return { raw: text, status: res.status }; }
 }
 
-// ===== Load user + data from server =====
-async function initUserFromServer() {
-  try {
-    await api('/api/user', 'POST', { id: USER_ID, name: S.name });
+async function refreshFromServer() {
+  // create user if missing
+  await api('/api/user', 'POST', { id: USER_ID, name: S.name || TG_NAME });
 
-    const user = await api('/api/user/' + USER_ID);
-    if (user && !user.error) {
-      S.name = user.name || S.name;
-      S.xp = (user.xp ?? S.xp);
-      S.level = (user.level ?? S.level);
-      S.streak = (user.streak ?? S.streak);
-    }
-
-    const tasks = await api('/api/tasks/' + USER_ID);
-    if (Array.isArray(tasks)) {
-      S.tasks = tasks.map(t => ({
-        id: t.id,
-        name: t.name,
-        sphere: t.sphere,
-        xp: t.xp ?? 10,
-        done: !!t.done
-      }));
-    }
-
-    const goals = await api('/api/goals/' + USER_ID);
-    if (Array.isArray(goals)) {
-      S.goals = goals.map(g => ({
-        id: g.id,
-        sphere: g.sphere,
-        name: g.name,
-        progress: g.progress ?? 0
-      }));
-    }
-
-    updateAll();
-    renderTasks();
-  } catch (e) {
-    console.log('initUserFromServer failed:', e);
+  const user = await api('/api/user/' + USER_ID);
+  if (user && !user.error) {
+    S.name = user.name || S.name || TG_NAME;
+    S.xp = user.xp ?? S.xp;
+    S.level = user.level ?? S.level;
+    S.streak = user.streak ?? S.streak;
   }
+
+  const tasks = await api('/api/tasks/' + USER_ID);
+  if (Array.isArray(tasks)) {
+    S.tasks = tasks.map(t => ({
+      id: t.id,
+      name: t.name,
+      sphere: t.sphere,
+      xp: t.xp ?? 10,
+      done: !!t.done
+    }));
+  }
+
+  const goals = await api('/api/goals/' + USER_ID);
+  if (Array.isArray(goals)) {
+    S.goals = goals.map(g => ({
+      id: g.id,
+      sphere: g.sphere,
+      name: g.name,
+      progress: g.progress ?? 0
+    }));
+    const gs = [...new Set(S.goals.map(g => g.sphere).filter(Boolean))];
+    if (gs.length) S.spheres = gs;
+  }
+
+  saveLocal();
+  updateAll();
+  renderTasks();
+  if (typeof renderGoals === 'function') renderGoals();
 }
 
-// ── STATE ──
-const SPHERES = ['Тело','Разум','Финансы','Образование','Дисциплина','Духовность','Отношения','Топ. жизнь'];
-const COLORS = { 'Тело':'#f97316','Разум':'#8b5cf6','Финансы':'#4ade80','Образование':'#60a5fa','Дисциплина':'#f59e0b','Духовность':'#a78bfa','Отношения':'#ec4899','Топ. жизнь':'#ef4444' };
-const RANKS = ['Новобранец','Ученик','Воин','Ветеран','Чемпион','Легенда'];
-
-let S = {
-  name:'Алекс', xp:10, level:1, streak:1,
-  spheres:['Финансы'],
-  goals:[
-    { sphere:'Финансы', name:'Накопить 100 000 ₽', progress:35 },
-    { sphere:'Тело', name:'Сбросить 5 кг', progress:20 }
-  ],
-  tasks:[
-    { name:'Утренняя зарядка 20 мин', sphere:'Тело', xp:10, done:false },
-    { name:'Прочитать 20 страниц', sphere:'Образование', xp:10, done:false },
-    { name:'30 подтягиваний', sphere:'Тело', xp:15, done:false },
-  ],
-  goalIdx:0,
-  duelProgress:15
-};
-
+// Start: load from server, then decide where to land
 document.addEventListener('DOMContentLoaded', () => {
-  initUserFromServer();
+  // set a sane default name
+  if (!S.name) S.name = TG_NAME;
+  refreshFromServer()
+    .then(() => {
+      // if user already has any goals/tasks, go to app, otherwise onboarding
+      const onboarded = (S.goals && S.goals.length) || (S.tasks && S.tasks.length) || localStorage.getItem('proto_onboarded') === '1';
+      if (onboarded) {
+        nav('s8');
+        setActiveNav('s8');
+      }
+    })
+    .catch((e) => console.log('refreshFromServer failed:', e));
 });
+
 
 // ── NAVIGATION ──
 const APP_SCREENS = ['s8','s9','s10','s11','s12','s13'];
@@ -719,7 +753,10 @@ function switchTab(id) {
 // ── ONBOARDING ──
 function saveName() {
   const v = document.getElementById('nameInput').value.trim();
-  if(v) S.name = v;
+  if (v) S.name = v;
+  saveLocal();
+  // best-effort persist user name
+  api('/api/user', 'POST', { id: USER_ID, name: S.name || TG_NAME }).catch(() => {});
   nav('s3');
 }
 
@@ -727,7 +764,8 @@ function toggleSphere(btn) { btn.classList.toggle('sel'); }
 
 function saveSpheres() {
   S.spheres = [...document.querySelectorAll('#sphereGrid .sphere-btn.sel')].map(b => b.dataset.s);
-  if(!S.spheres.length) { showToast('⚠️ Выбери сферу','хотя бы одну'); return; }
+    saveLocal();
+if(!S.spheres.length) { showToast('⚠️ Выбери сферу','хотя бы одну'); return; }
   S.goalIdx = 0;
   showGoalStep();
 }
@@ -744,20 +782,38 @@ function showGoalStep() {
 
 function saveGoal() {
   const v = document.getElementById('goalInput').value.trim();
-  if(v) S.goals.push({ sphere:S.spheres[S.goalIdx], name:v, progress:0 });
+  if (v) {
+    const sphere = S.spheres[S.goalIdx];
+    S.goals.push({ id: null, sphere, name: v, progress: 0 });
+    // persist
+    api('/api/goals/' + USER_ID, 'POST', { sphere, name: v })
+      .then(() => refreshFromServer())
+      .catch(() => {});
+  }
   S.goalIdx++;
+  saveLocal();
   showGoalStep();
 }
 
 function saveFirstTask() {
   const v = document.getElementById('taskInput').value.trim();
-  if(v) S.tasks.unshift({ name:v, sphere:S.spheres[0]||'Тело', xp:10, done:false });
+  if (v) {
+    const sphere = S.spheres[0] || 'Тело';
+    const xp = 10;
+    S.tasks.unshift({ id: null, name: v, sphere, xp, done: false });
+    api('/api/tasks/' + USER_ID, 'POST', { name: v, sphere, xp })
+      .then(() => refreshFromServer())
+      .catch(() => {});
+  }
+  saveLocal();
   nav('s7');
 }
 
 function goToApp() {
   nav('s8');
   setActiveNav('s8');
+  localStorage.setItem('proto_onboarded','1');
+  refreshFromServer().catch(()=>{});
   updateAll();
   renderTasks();
 }
@@ -798,13 +854,14 @@ function updateAll() {
 function safeSet(id, fn) { const el = document.getElementById(id); if(el) fn(el); }
 
 function gainXP(amount, label) {
-  S.xp += amount;
+  // amount can be 0 (UI message only)
+  if (amount) S.xp += amount;
   updateAll();
   renderTasks();
   showToast('+' + amount + ' XP', label);
 
-  // Persist XP to backend (best-effort)
   api('/api/user/' + USER_ID + '/xp', 'POST', { amount })
+    .then(() => refreshFromServer())
     .catch(() => {});
 }
 
@@ -833,6 +890,13 @@ function completeAll() {
   else showToast('✅ Уже всё готово!','Молодец!');
   // add actual XP
   S.xp += gained; updateAll(); renderTasks();
+
+  // persist completion (best-effort)
+  const pending = S.tasks.filter(t => t.id && !t.done);
+  Promise.all(pending.map(t => api('/api/tasks/' + USER_ID + '/complete/' + t.id, 'POST', { amount: t.xp })))
+    .then(() => refreshFromServer())
+    .catch(() => {});
+
 }
 
 function renderFullTasks(filter) {
@@ -873,18 +937,15 @@ function addTask() {
   const xp = parseInt(document.getElementById('newTaskXp').value)||10;
   if(!name){ showToast('⚠️','Введи название'); return; }
   S.tasks.unshift({ name, sphere, xp, done:false });
-  // save to server and refresh list
-  api('/api/tasks/' + USER_ID, 'POST', { name, sphere, xp })
-    .then(() => api('/api/tasks/' + USER_ID))
-    .then((tasks) => { if (Array.isArray(tasks)) {
-      S.tasks = tasks.map(t => ({ id:t.id, name:t.name, sphere:t.sphere, xp:t.xp ?? 10, done:!!t.done }));
-      renderTasks(); renderFullTasks('all'); updateAll();
-    } })
+    api('/api/tasks/' + USER_ID, 'POST', { name, sphere, xp })
+    .then(() => refreshFromServer())
     .catch(() => {});
-  document.getElementById('newTaskName').value = '';
+document.getElementById('newTaskName').value = '';
   closeModal('mAddTask');
   renderTasks(); renderFullTasks('all');
   showToast('✅ Задача добавлена', name);
+
+  saveLocal();
 }
 
 // ── GOALS ──
@@ -911,18 +972,15 @@ function addGoal() {
   const name = document.getElementById('newGoalName').value.trim();
   if(!name){ showToast('⚠️','Введи название цели'); return; }
   S.goals.push({ sphere, name, progress:0 });
-  // save to server and refresh list
-  api('/api/goals/' + USER_ID, 'POST', { sphere, name })
-    .then(() => api('/api/goals/' + USER_ID))
-    .then((goals) => { if (Array.isArray(goals)) {
-      S.goals = goals.map(g => ({ id:g.id, sphere:g.sphere, name:g.name, progress:g.progress ?? 0 }));
-      renderGoals(); updateAll();
-    } })
+    api('/api/goals/' + USER_ID, 'POST', { sphere, name })
+    .then(() => refreshFromServer())
     .catch(() => {});
-  document.getElementById('newGoalName').value = '';
+document.getElementById('newGoalName').value = '';
   closeModal('mAddGoal');
   renderGoals();
   showToast('🎯 Цель добавлена', name);
+
+  saveLocal();
 }
 
 // ── SETTINGS ──
@@ -1027,41 +1085,6 @@ document.addEventListener('click', e => {
     });
   });
 })();
-
-// ===== API =====
-async function api(path, method = "GET", body = null) {
-  const res = await fetch(API + path, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: body ? JSON.stringify(body) : null
-  });
-
-  return await res.json();
-}
-
-// ===== INIT USER =====
-async function initUser() {
-  if (!USER_ID) return;
-
-  // создаём если нет
-  await api("/api/user", "POST", {
-    telegram_id: USER_ID,
-    name: S.name
-  });
-
-  // получаем данные
-  const data = await api("/api/user/" + USER_ID);
-
-  if (data) {
-    S.xp = data.xp;
-    S.level = data.level;
-    S.streak = data.streak;
-    updateAll();
-  }
-}
-
-document.addEventListener("DOMContentLoaded", initUser);
-
 </script>
 </div>
 </body>
