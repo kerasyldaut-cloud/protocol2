@@ -3,13 +3,33 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
+const TelegramBot = require('node-telegram-bot-api');
 
-const app = express();
+const app = express();   // ← СНАЧАЛА создаём app
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+// ===== TELEGRAM BOT =====
+const bot = new TelegramBot(process.env.BOT_TOKEN);
+const WEBHOOK_PATH = `/telegram-webhook/${process.env.BOT_TOKEN}`;
+
+app.post(WEBHOOK_PATH, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
+
+(async () => {
+  const url = `${process.env.PUBLIC_URL}${WEBHOOK_PATH}`;
+  await bot.setWebHook(url);
+  console.log('Webhook set to:', url);
+})();
+
+// ===== SUPABASE =====
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+););
 
 // --- helpers ---
 const xpNeed = (lvl) => Math.max(100, lvl * 100);
