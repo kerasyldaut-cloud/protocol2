@@ -104,6 +104,24 @@ app.get('/api/leaderboard', async (req, res) => {
   res.json(data);
 });
 
+app.post('/api/user/:id/sync', async (req, res) => {
+  const { name } = req.body;
+  await db.createUser(req.params.id, name);
+  res.json({ ok: true });
+});
+
+app.post('/api/user/:id/name', async (req, res) => {
+  const { name } = req.body;
+  await db.updateUser(req.params.id, { name });
+  res.json({ ok: true });
+});
+
+app.post('/api/goals/:id/progress/:goalId', async (req, res) => {
+  const { progress } = req.body;
+  await db.updateGoalProgress(req.params.goalId, progress);
+  res.json({ ok: true });
+});
+
 cron.schedule('0 8 * * *', async () => {
   const users = await db.getLeaderboard();
   users.forEach(u => {

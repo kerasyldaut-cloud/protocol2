@@ -1,817 +1,832 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>PROTOCOL RPG</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    :root{
-      --bg:#070A14;
-      --panel:#0D1226;
-      --panel2:#0B1022;
-      --stroke:rgba(139,92,246,.28);
-      --txt:#EAF0FF;
-      --muted:rgba(234,240,255,.72);
-      --accent:#8B5CF6;
-      --accent2:#6366F1;
-      --good:#22C55E;
-      --warn:#F59E0B;
-      --bad:#EF4444;
-      --shadow: 0 18px 60px rgba(0,0,0,.45);
-      --radius: 22px;
-      --radius2: 16px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background:
-        radial-gradient(1200px 700px at 10% -10%, rgba(139,92,246,.35), transparent 60%),
-        radial-gradient(1000px 600px at 100% 0%, rgba(99,102,241,.28), transparent 55%),
-        radial-gradient(900px 600px at 35% 110%, rgba(34,197,94,.12), transparent 55%),
-        var(--bg);
-      color:var(--txt);
-      overflow-x:hidden;
-    }
-    .app{max-width:520px;margin:0 auto;min-height:100%;padding:18px 14px 92px}
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
-    .brand{display:flex;align-items:center;gap:10px}
-    .logo{
-      width:44px;height:44px;border-radius:14px;
-      background:linear-gradient(135deg, rgba(139,92,246,.95), rgba(99,102,241,.75));
-      box-shadow: 0 12px 40px rgba(139,92,246,.25);
-      display:grid;place-items:center;
-      border:1px solid rgba(255,255,255,.12);
-      position:relative;
-      overflow:hidden;
-    }
-    .logo:after{
-      content:"";
-      position:absolute;inset:-60px;
-      background:conic-gradient(from 90deg, transparent, rgba(255,255,255,.15), transparent);
-      animation:spin 3.5s linear infinite;
-    }
-    .logo b{position:relative;z-index:2}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .brand h1{font-size:16px;line-height:1.1;margin:0}
-    .brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
-    .pill{
-      padding:10px 12px;border-radius:999px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      color:var(--muted);
-      font-size:12px;
-      display:flex;align-items:center;gap:8px;
-    }
-    .grid{display:grid;gap:12px}
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow:var(--shadow);
-      border-radius:var(--radius);
-      padding:14px;
-      position:relative;
-      overflow:hidden;
-    }
-    .card:before{
-      content:"";
-      position:absolute;inset:0;
-      background:radial-gradient(800px 200px at 10% 0%, rgba(139,92,246,.18), transparent 55%);
-      pointer-events:none;
-    }
-    .card > *{position:relative}
-    .row{display:flex;gap:10px;align-items:center}
-    .row.between{justify-content:space-between}
-    .kpi{display:flex;gap:10px}
-    .kpi .mini{
-      flex:1;
-      padding:12px;
-      border-radius:18px;
-      background:rgba(0,0,0,.16);
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .mini .label{color:var(--muted);font-size:12px}
-    .mini .value{font-size:18px;margin-top:4px}
-    .progress{
-      height:12px;border-radius:999px;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.10);
-      overflow:hidden;
-    }
-    .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
-    .muted{color:var(--muted)}
-    .btn{
-      appearance:none;border:none;cursor:pointer;
-      border-radius:16px;
-      padding:12px 14px;
-      font-weight:700;
-      color:var(--txt);
-      background:linear-gradient(135deg, rgba(139,92,246,.95), rgba(99,102,241,.85));
-      box-shadow:0 16px 40px rgba(139,92,246,.20);
-    }
-    .btn.secondary{
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:none;
-      color:var(--txt);
-      font-weight:650;
-    }
-    .btn.ghost{
-      background:transparent;
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:none;
-    }
-    .btn.small{padding:10px 12px;border-radius:14px;font-size:13px}
-    .input{
-      width:100%;
-      border-radius:16px;
-      padding:13px 14px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.20);
-      color:var(--txt);
-      outline:none;
-      font-size:14px;
-    }
-    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-    .chip{
-      padding:10px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      font-size:13px;
-      color:var(--txt);
-      cursor:pointer;
-      user-select:none;
-    }
-    .chip.on{
-      background:rgba(139,92,246,.22);
-      border-color:rgba(139,92,246,.45);
-      box-shadow:0 14px 40px rgba(139,92,246,.12);
-    }
-    .list{display:grid;gap:10px;margin-top:10px}
-    .item{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:12px;
-      border-radius:18px;
-      background:rgba(0,0,0,.16);
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .item .title{font-weight:700}
-    .item .sub{font-size:12px;color:var(--muted);margin-top:2px}
-    .tag{
-      padding:8px 10px;border-radius:999px;font-size:12px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      color:var(--muted);
-      white-space:nowrap;
-    }
-    .nav{
-      position:fixed;left:0;right:0;bottom:0;
-      padding:10px 14px 14px;
-      background:linear-gradient(180deg, transparent, rgba(7,10,20,.88) 26%, rgba(7,10,20,.96));
-      backdrop-filter: blur(10px);
-    }
-    .nav .bar{
-      max-width:520px;margin:0 auto;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:24px;
-      padding:10px;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      box-shadow:0 20px 70px rgba(0,0,0,.5);
-    }
-    .tab{
-      flex:1;
-      padding:10px 10px;
-      border-radius:18px;
-      text-align:center;
-      font-size:12px;
-      color:var(--muted);
-      cursor:pointer;
-      user-select:none;
-      border:1px solid transparent;
-    }
-    .tab.on{
-      color:var(--txt);
-      background:rgba(139,92,246,.18);
-      border-color:rgba(139,92,246,.35);
-    }
-    .toast{
-      position:fixed;left:50%;transform:translateX(-50%);
-      bottom:98px;
-      max-width:520px;width:calc(100% - 28px);
-      background:rgba(0,0,0,.42);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:16px;
-      padding:12px 14px;
-      color:var(--txt);
-      box-shadow:0 18px 60px rgba(0,0,0,.5);
-      display:none;
-    }
-    .toast b{display:block}
-    .toast small{color:var(--muted)}
-    .hidden{display:none !important}
-    a{color:inherit}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>PROTOCOL 2.0</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d1a;
+  --card: rgba(255,255,255,0.05);
+  --card2: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.1);
+  --accent: #7B6EF6;
+  --accent2: #a78bfa;
+  --grad: linear-gradient(135deg, #7B6EF6, #b06ef6, #6eb4f6);
+  --grad2: linear-gradient(135deg, #6B5EE6 0%, #9B6EFF 50%, #6EAAF6 100%);
+  --text: #fff;
+  --muted: rgba(255,255,255,0.45);
+  --green: #4ade80;
+  --red: #f87171;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text); min-height:100vh; overflow-x:hidden; }
+.screen { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; padding:28px 20px; opacity:0; pointer-events:none; transition:opacity 0.3s; overflow-y:auto; }
+.screen.active { opacity:1; pointer-events:all; }
+.glow-orb { position:fixed; border-radius:50%; filter:blur(80px); pointer-events:none; z-index:0; }
+.screen > * { position:relative; z-index:1; width:100%; }
+@keyframes slideIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.screen.active > *:nth-child(1){animation:slideIn 0.3s ease forwards}
+.screen.active > *:nth-child(2){animation:slideIn 0.3s 0.05s ease forwards;opacity:0}
+.screen.active > *:nth-child(3){animation:slideIn 0.3s 0.1s ease forwards;opacity:0}
+.screen.active > *:nth-child(4){animation:slideIn 0.3s 0.15s ease forwards;opacity:0}
+.screen.active > *:nth-child(5){animation:slideIn 0.3s 0.2s ease forwards;opacity:0}
+.screen.active > *:nth-child(6){animation:slideIn 0.3s 0.25s ease forwards;opacity:0}
+.screen.active > *:nth-child(7){animation:slideIn 0.3s 0.3s ease forwards;opacity:0}
+.screen.active > *:nth-child(8){animation:slideIn 0.3s 0.35s ease forwards;opacity:0}
+
+/* TYPOGRAPHY */
+.h1 { font-family:'Unbounded',sans-serif; font-size:38px; font-weight:900; line-height:1.1; text-align:center; }
+.h2 { font-family:'Unbounded',sans-serif; font-size:26px; font-weight:800; line-height:1.2; text-align:center; }
+.grad-text { background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+/* BUTTONS */
+.btn { width:100%; padding:17px; border:none; border-radius:100px; font-family:'Manrope',sans-serif; font-size:16px; font-weight:700; cursor:pointer; transition:transform 0.12s,box-shadow 0.15s; position:relative; overflow:hidden; display:block; }
+.btn:active { transform:scale(0.96); }
+.btn-primary { background:var(--grad2); color:#fff; box-shadow:0 8px 32px rgba(123,110,246,0.45); }
+.btn-ghost { background:var(--card2); color:#fff; border:1px solid var(--border); backdrop-filter:blur(10px); }
+.btn-danger { background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.3); }
+.ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,0.22); transform:scale(0); animation:ripAnim 0.5s linear; pointer-events:none; }
+@keyframes ripAnim { to{transform:scale(4);opacity:0} }
+
+/* INPUT */
+.input { width:100%; padding:17px 20px; background:var(--card2); border:1px solid var(--border); border-radius:16px; color:#fff; font-family:'Manrope',sans-serif; font-size:15px; outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
+.input::placeholder { color:var(--muted); }
+.input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(123,110,246,0.2); }
+
+/* CARD */
+.card { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:20px; padding:18px; }
+
+/* DOTS */
+.dots { display:flex; gap:6px; justify-content:center; }
+.dot { width:6px; height:6px; border-radius:3px; background:var(--muted); transition:all 0.3s; }
+.dot.on { width:20px; background:var(--accent); }
+
+/* BOTTOM NAV */
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(13,13,26,0.96); border-top:1px solid var(--border); display:none; padding:10px 8px 22px; gap:2px; backdrop-filter:blur(20px); z-index:50; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 4px; border-radius:14px; cursor:pointer; transition:all 0.2s; border:none; background:transparent; color:var(--muted); font-family:'Manrope',sans-serif; }
+.nav-item:active { transform:scale(0.90); }
+.nav-item.active { color:var(--accent2); background:rgba(123,110,246,0.12); }
+.nav-icon { font-size:20px; }
+.nav-label { font-size:10px; font-weight:600; }
+
+/* SPHERE GRID */
+.sphere-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; }
+.sphere-btn { padding:13px 14px; background:var(--card); border:1px solid var(--border); border-radius:100px; color:#fff; font-family:'Manrope',sans-serif; font-size:13px; font-weight:600; cursor:pointer; text-align:left; display:flex; align-items:center; gap:8px; transition:all 0.2s; }
+.sphere-btn.sel { background:rgba(123,110,246,0.25); border-color:var(--accent); color:var(--accent2); }
+.sphere-btn:active { transform:scale(0.95); }
+
+/* SUCCESS ORB */
+.success-orb { width:90px; height:90px; background:var(--card2); border:1px solid var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:40px; margin:0 auto; animation:pulseGlow 2s infinite; width:auto; }
+@keyframes pulseGlow { 0%,100%{box-shadow:0 0 0 0 rgba(123,110,246,0.3)} 50%{box-shadow:0 0 0 20px rgba(123,110,246,0)} }
+
+/* DASHBOARD */
+.profile-row { display:flex; align-items:center; gap:12px; }
+.avatar { width:46px; height:46px; min-width:46px; border-radius:50%; background:var(--grad2); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; }
+.level-badge { padding:6px 14px; background:var(--card2); border:1px solid var(--border); border-radius:100px; font-size:12px; font-weight:700; display:flex; align-items:center; gap:5px; white-space:nowrap; margin-left:auto; }
+.xp-section { width:100%; }
+.xp-header { display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:8px; }
+.xp-bar-bg { height:8px; background:var(--card2); border-radius:4px; overflow:hidden; }
+.xp-bar-fill { height:100%; background:var(--grad2); border-radius:4px; transition:width 0.8s ease; box-shadow:0 0 10px rgba(123,110,246,0.6); }
+.stats-row { display:flex; gap:8px; width:100%; }
+.stat-card { flex:1; background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
+.stat-val { font-family:'Unbounded',sans-serif; font-size:16px; font-weight:900; color:var(--accent2); }
+.stat-lbl { font-size:10px; color:var(--muted); margin-top:3px; }
+
+/* TASKS */
+.task-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); cursor:pointer; transition:opacity 0.2s; }
+.task-row:last-of-type { border-bottom:none; }
+.task-row:active { opacity:0.7; }
+.task-check { width:26px; min-width:26px; height:26px; background:var(--card); border:1.5px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; transition:all 0.2s; }
+.task-check.done { background:var(--accent); border-color:var(--accent); }
+.task-text { font-size:13px; color:rgba(255,255,255,0.8); transition:all 0.2s; flex:1; }
+.task-text.done { text-decoration:line-through; color:var(--muted); }
+.task-xp { font-size:11px; font-weight:700; color:var(--accent2); white-space:nowrap; }
+
+/* LEADERBOARD */
+.top3 { display:flex; align-items:flex-end; justify-content:center; gap:10px; width:100%; }
+.top-item { display:flex; flex-direction:column; align-items:center; gap:5px; }
+.top-av { border-radius:50%; background:var(--grad2); display:flex; align-items:center; justify-content:center; font-weight:700; }
+.top-av.r1 { width:64px; height:64px; font-size:22px; box-shadow:0 0 24px rgba(255,200,0,0.4); }
+.top-av.r2 { width:52px; height:52px; font-size:18px; }
+.top-av.r3 { width:46px; height:46px; font-size:16px; }
+.top-uname { font-size:11px; font-weight:600; color:var(--muted); }
+.top-xp2 { font-size:12px; font-weight:800; color:var(--accent2); }
+.pedestal { border-radius:8px 8px 0 0; background:var(--card2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-family:'Unbounded',sans-serif; font-size:18px; font-weight:900; width:70px; }
+.p1 { height:56px; background:rgba(255,200,0,0.1); border-color:rgba(255,200,0,0.3); color:#ffd700; }
+.p2 { height:44px; }
+.p3 { height:34px; }
+.lb-item { display:flex; align-items:center; gap:10px; padding:12px; background:var(--card); border:1px solid var(--border); border-radius:14px; width:100%; }
+.lb-item.me { background:rgba(123,110,246,0.15); border-color:var(--accent); }
+.lb-rank { font-size:13px; font-weight:800; color:var(--muted); width:20px; text-align:center; flex-shrink:0; }
+.lb-av { width:36px; height:36px; min-width:36px; border-radius:50%; background:var(--grad2); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; }
+.lb-info { flex:1; min-width:0; }
+.lb-name { font-size:13px; font-weight:600; }
+.lb-streak { font-size:11px; color:var(--muted); }
+.lb-xp2 { font-size:13px; font-weight:800; color:var(--accent2); white-space:nowrap; }
+.duel-chip { padding:5px 10px; background:rgba(248,113,113,0.15); border:1px solid rgba(248,113,113,0.3); border-radius:100px; color:var(--red); font-size:11px; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif; flex-shrink:0; }
+.duel-chip:active { transform:scale(0.9); }
+
+/* GOALS */
+.goal-item { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:18px; padding:16px; cursor:pointer; transition:border-color 0.2s; }
+.goal-item:active { transform:scale(0.98); }
+.goal-sphere-tag { font-size:11px; font-weight:700; margin-bottom:6px; }
+.goal-name2 { font-size:15px; font-weight:700; margin-bottom:10px; }
+.goal-prog-bg { height:6px; background:var(--card); border-radius:3px; overflow:hidden; margin-bottom:6px; }
+.goal-prog-fill { height:100%; border-radius:3px; transition:width 0.6s; }
+.goal-prog-lbl { font-size:11px; color:var(--muted); }
+.add-dashed { width:100%; padding:16px; background:var(--card); border:2px dashed var(--border); border-radius:18px; color:var(--muted); font-family:'Manrope',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+.add-dashed:hover { border-color:var(--accent); color:var(--accent2); }
+
+/* TASKS FULL */
+.task-full-row { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:all 0.2s; }
+.task-full-row:active { transform:scale(0.98); }
+.task-sphere-dot { width:10px; height:10px; min-width:10px; border-radius:50%; }
+.task-full-info { flex:1; min-width:0; }
+.task-full-name { font-size:14px; font-weight:600; }
+.task-full-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+.task-full-check { width:28px; height:28px; min-width:28px; background:var(--card); border:1.5px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+.task-full-check.done { background:var(--accent); border-color:var(--accent); }
+.filter-tabs { display:flex; gap:8px; width:100%; }
+.filter-tab { padding:8px 16px; background:var(--card); border:1px solid var(--border); border-radius:100px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; color:var(--muted); font-family:'Manrope',sans-serif; }
+.filter-tab.active { background:rgba(123,110,246,0.2); border-color:var(--accent); color:var(--accent2); }
+
+/* SETTINGS */
+.settings-av { width:80px; height:80px; border-radius:50%; background:var(--grad2); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:700; border:3px solid var(--accent); margin:0 auto; }
+.slabel { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; width:100%; }
+.settings-item { display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--card2); border:1px solid var(--border); border-radius:16px; margin-bottom:8px; cursor:pointer; transition:background 0.2s; width:100%; }
+.settings-item:active { background:rgba(255,255,255,0.1); }
+.s-icon { font-size:20px; width:32px; text-align:center; flex-shrink:0; }
+.s-info { flex:1; }
+.s-name { font-size:14px; font-weight:600; }
+.s-sub { font-size:12px; color:var(--muted); }
+.s-arrow { color:var(--muted); font-size:16px; }
+.toggle { width:44px; min-width:44px; height:26px; background:var(--card); border-radius:13px; position:relative; cursor:pointer; transition:background 0.3s; border:1px solid var(--border); }
+.toggle.on { background:var(--accent); }
+.toggle-knob { position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition:transform 0.3s; box-shadow:0 1px 4px rgba(0,0,0,0.3); }
+.toggle.on .toggle-knob { transform:translateX(18px); }
+.badge-row { display:flex; gap:8px; width:100%; flex-wrap:wrap; }
+.badge2 { display:flex; flex-direction:column; align-items:center; gap:5px; padding:14px 8px; background:var(--card2); border:1px solid var(--border); border-radius:16px; flex:1; min-width:65px; cursor:pointer; transition:all 0.2s; }
+.badge2:active { transform:scale(0.93); }
+.badge2.earned { border-color:var(--accent); background:rgba(123,110,246,0.15); }
+.badge2-icon { font-size:24px; }
+.badge2-lbl { font-size:10px; font-weight:600; color:var(--muted); text-align:center; }
+.badge2.earned .badge2-lbl { color:var(--accent2); }
+
+/* MODAL */
+.modal { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:flex-end; z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; backdrop-filter:blur(4px); }
+.modal.open { opacity:1; pointer-events:all; }
+.modal-sheet { width:100%; background:#12122e; border-radius:28px 28px 0 0; padding:28px 22px 40px; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1); border-top:1px solid var(--border); }
+.modal.open .modal-sheet { transform:translateY(0); }
+.modal-handle { width:40px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 24px; }
+.modal-title { font-family:'Unbounded',sans-serif; font-size:20px; font-weight:800; margin-bottom:20px; }
+.modal-close { position:absolute; top:20px; right:22px; width:32px; height:32px; background:var(--card2); border:1px solid var(--border); border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; }
+.modal-close:active { transform:scale(0.9); }
+
+/* TOAST */
+.toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(16px); background:rgba(18,18,46,0.95); border:1px solid var(--border); border-radius:18px; padding:14px 22px; text-align:center; opacity:0; pointer-events:none; transition:all 0.3s; z-index:400; backdrop-filter:blur(20px); white-space:nowrap; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast-val { font-family:'Unbounded',sans-serif; font-size:22px; font-weight:900; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.toast-lbl { font-size:12px; color:var(--muted); margin-top:2px; }
+
+.shead { display:flex; align-items:center; gap:12px; width:100%; margin-bottom:14px; flex-shrink:0; }
+.back-btn { width:36px; height:36px; min-width:36px; background:var(--card2); border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; }
+.back-btn:active { transform:scale(0.93); }
+
+::-webkit-scrollbar { width:3px; }
+::-webkit-scrollbar-thumb { background:var(--card2); border-radius:2px; }
+
+/* LOADING */
+.loading { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; gap:16px; }
+.loading-spinner { width:40px; height:40px; border:3px solid var(--card2); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+</style>
 </head>
 <body>
-  <div class="app">
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo"><b>⚡</b></div>
-        <div>
-          <h1>PROTOCOL RPG</h1>
-          <p id="subtitle">загрузка...</p>
-        </div>
-      </div>
-      <div class="pill" title="ID">
-        <span>👤</span><span id="uid">...</span>
-      </div>
+
+<!-- LOADING -->
+<div id="loadingScreen" class="loading">
+  <div class="loading-spinner"></div>
+  <div style="font-family:'Unbounded',sans-serif;font-size:14px;color:var(--muted);">Загрузка...</div>
+</div>
+
+<!-- S1 WELCOME -->
+<div class="screen" id="s1">
+  <div class="glow-orb" style="width:300px;height:300px;background:rgba(123,110,246,0.18);bottom:0;left:50%;transform:translateX(-50%);"></div>
+  <div style="font-family:'Unbounded',sans-serif;font-size:11px;font-weight:600;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;text-align:center;margin-bottom:48px;margin-top:60px;">Protocol 2.0</div>
+  <div class="h1 grad-text" style="margin-bottom:14px;">Добро<br>пожало&shy;вать</div>
+  <div style="font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:52px;text-align:center;">Настроим твою систему<br>прокачки за 1 минуту</div>
+  <div class="dots" style="margin-bottom:52px;"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+  <button class="btn btn-primary" onclick="nav('s2')">Начать</button>
+</div>
+
+<!-- S2 NAME -->
+<div class="screen" id="s2">
+  <div class="glow-orb" style="width:200px;height:200px;background:rgba(110,164,246,0.15);top:60px;right:-60px;"></div>
+  <div style="margin-top:80px;"></div>
+  <div class="h2" style="margin-bottom:48px;">Как тебя<br>зовут?</div>
+  <input class="input" id="nameInput" type="text" placeholder="Введи имя" style="margin-bottom:20px;">
+  <button class="btn btn-primary" style="margin-top:auto;" onclick="saveName()">Далее</button>
+</div>
+
+<!-- S3 AGE -->
+<div class="screen" id="s3">
+  <div class="glow-orb" style="width:250px;height:250px;background:rgba(123,110,246,0.12);bottom:0;right:-80px;"></div>
+  <div style="margin-top:80px;"></div>
+  <div class="h2" style="margin-bottom:44px;">Сколько<br>тебе лет?</div>
+  <input class="input" id="ageInput" type="number" min="10" max="99" placeholder="Введите возраст" style="margin-bottom:12px;">
+  <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:40px;line-height:1.5;">Возраст нужен для<br>персонализации задач</div>
+  <button class="btn btn-primary" style="margin-top:auto;" onclick="nav('s4')">Далее</button>
+</div>
+
+<!-- S4 SPHERES -->
+<div class="screen" id="s4" style="justify-content:flex-start;padding-top:44px;">
+  <div class="glow-orb" style="width:300px;height:200px;background:rgba(123,110,246,0.12);bottom:0;left:50%;transform:translateX(-50%);"></div>
+  <div class="h2 grad-text" style="margin-bottom:28px;">Выбери сферы<br>для прокачки</div>
+  <div class="sphere-grid" style="margin-bottom:20px;" id="sphereGrid">
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Тело">💪 Тело</button>
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Разум">🧠 Разум</button>
+    <button class="sphere-btn sel" onclick="toggleSphere(this)" data-s="Финансы">📈 Финансы</button>
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Образование">📚 Образование</button>
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Дисциплина">⚡ Дисциплина</button>
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Духовность">🌱 Духовность</button>
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Отношения">🤝 Отношения</button>
+    <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Топ. жизнь">🔥 Топ. жизнь</button>
+  </div>
+  <button class="btn btn-primary" onclick="saveSpheres()">Продолжить</button>
+</div>
+
+<!-- S5 GOAL -->
+<div class="screen" id="s5" style="justify-content:center;">
+  <div class="glow-orb" style="width:220px;height:220px;background:rgba(110,164,246,0.15);top:40px;right:-70px;"></div>
+  <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:20px;" id="goalStep">Шаг 1 из 1</div>
+  <div style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:24px;padding:24px;margin-bottom:20px;">
+    <div style="font-size:12px;font-weight:700;margin-bottom:8px;" id="goalSphLabel">Сфера: Тело</div>
+    <div class="h2" style="text-align:left;font-size:22px;margin-bottom:20px;">Какая твоя цель<br>в этой сфере?</div>
+    <input class="input" id="goalInput" type="text" placeholder="Например: сбросить 5 кг">
+  </div>
+  <button class="btn btn-primary" onclick="saveGoal()">Далее</button>
+</div>
+
+<!-- S6 FIRST TASK -->
+<div class="screen" id="s6" style="justify-content:center;">
+  <div class="glow-orb" style="width:280px;height:200px;background:rgba(123,110,246,0.15);bottom:0;left:50%;transform:translateX(-50%);"></div>
+  <div class="h2" style="margin-bottom:12px;">Добавь первую задачу</div>
+  <div style="font-size:14px;color:var(--muted);text-align:center;margin-bottom:32px;">Что ты сделаешь уже завтра?</div>
+  <input class="input" id="taskInput" type="text" placeholder="Например: 30 подтягиваний" style="margin-bottom:20px;">
+  <button class="btn btn-primary" onclick="saveFirstTask()">Добавить задачу</button>
+</div>
+
+<!-- S7 SUCCESS -->
+<div class="screen" id="s7" style="justify-content:center;text-align:center;">
+  <div class="glow-orb" style="width:280px;height:280px;background:rgba(123,110,246,0.2);bottom:0;left:50%;transform:translateX(-50%);"></div>
+  <div class="success-orb" style="margin-bottom:24px;">✈️</div>
+  <div class="h2" style="margin-bottom:10px;">Профиль создан</div>
+  <div style="font-size:15px;color:var(--muted);margin-bottom:52px;">Ты готов к прокачке</div>
+  <button class="btn btn-ghost" onclick="goToApp()">Перейти в меню</button>
+</div>
+
+<!-- S8 DASHBOARD -->
+<div class="screen" id="s8" style="justify-content:flex-start;padding-bottom:88px;gap:12px;">
+  <div class="glow-orb" style="width:200px;height:200px;background:rgba(123,110,246,0.1);top:-60px;right:-60px;"></div>
+  <div class="profile-row">
+    <div class="avatar" id="av">А</div>
+    <div style="flex:1;">
+      <div style="font-size:16px;font-weight:700;" id="dn">Загрузка...</div>
+      <div style="font-size:12px;color:var(--muted);" id="rankTitle">Новобранец</div>
     </div>
-
-    <!-- ONBOARDING -->
-    <section id="onboarding" class="grid hidden">
-      <div class="card">
-        <div class="row between">
-          <div>
-            <div style="font-weight:900;font-size:18px">Создай персонажа</div>
-            <div class="muted" style="margin-top:6px">Имя + сферы жизни. Всё сохранится в облаке.</div>
-          </div>
-          <div class="tag">v1</div>
-        </div>
-
-        <div style="margin-top:14px">
-          <div class="muted" style="font-size:12px;margin-bottom:8px">Имя</div>
-          <input id="nameInput" class="input" maxlength="24" placeholder="Например: Ерасыл" />
-        </div>
-
-        <div style="margin-top:14px">
-          <div class="muted" style="font-size:12px;margin-bottom:8px">Выбери сферы (3–6)</div>
-          <div id="chips" class="chips"></div>
-        </div>
-
-        <div class="row" style="margin-top:14px">
-          <button id="startBtn" class="btn" style="flex:1">Начать</button>
-          <button id="skipBtn" class="btn secondary small">Пропустить</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- HOME -->
-    <section id="home" class="grid hidden">
-      <div class="card">
-        <div class="row between">
-          <div>
-            <div style="font-weight:900;font-size:18px" id="heroTitle">Игрок</div>
-            <div class="muted" id="heroSub" style="margin-top:4px">уровень и XP</div>
-          </div>
-          <div class="tag" id="rankTag">Новичок</div>
-        </div>
-
-        <div style="margin-top:12px">
-          <div class="row between">
-            <div class="muted" style="font-size:12px">XP</div>
-            <div class="muted" style="font-size:12px" id="xpText">0 / 100</div>
-          </div>
-          <div class="progress" style="margin-top:8px"><div class="bar" id="xpBar"></div></div>
-        </div>
-
-        <div class="kpi" style="margin-top:12px">
-          <div class="mini">
-            <div class="label">Уровень</div>
-            <div class="value" id="lvl">1</div>
-          </div>
-          <div class="mini">
-            <div class="label">Streak</div>
-            <div class="value" id="streak">0</div>
-          </div>
-          <div class="mini">
-            <div class="label">Сегодня</div>
-            <div class="value" id="todayDone">0</div>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:12px">
-          <button class="btn small" id="quickTask">+ Задача</button>
-          <button class="btn secondary small" id="quickGoal">+ Цель</button>
-          <button class="btn ghost small" id="syncBtn">Синк</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="row between">
-          <div style="font-weight:900">Сферы</div>
-          <div class="muted" style="font-size:12px">нажми чтобы выбрать</div>
-        </div>
-        <div id="sphereList" class="list"></div>
-      </div>
-    </section>
-
-    <!-- GOALS -->
-    <section id="goals" class="grid hidden">
-      <div class="card">
-        <div class="row between">
-          <div>
-            <div style="font-weight:900;font-size:18px">Цели</div>
-            <div class="muted" style="margin-top:4px">прогресс сохраняется</div>
-          </div>
-          <button class="btn small" id="addGoalBtn">+ Добавить</button>
-        </div>
-
-        <div id="goalForm" class="hidden" style="margin-top:12px">
-          <input id="goalName" class="input" placeholder="Например: IELTS 7.0" />
-          <div class="row" style="margin-top:10px">
-            <select id="goalSphere" class="input" style="flex:1"></select>
-            <button id="goalSave" class="btn small">Сохранить</button>
-          </div>
-        </div>
-
-        <div id="goalList" class="list" style="margin-top:12px"></div>
-      </div>
-    </section>
-
-    <!-- TASKS -->
-    <section id="tasks" class="grid hidden">
-      <div class="card">
-        <div class="row between">
-          <div>
-            <div style="font-weight:900;font-size:18px">Задачи на сегодня</div>
-            <div class="muted" style="margin-top:4px">выполнил = XP</div>
-          </div>
-          <button class="btn small" id="addTaskBtn">+ Добавить</button>
-        </div>
-
-        <div id="taskForm" class="hidden" style="margin-top:12px">
-          <input id="taskName" class="input" placeholder="Например: 30 подтягиваний" />
-          <div class="row" style="margin-top:10px">
-            <select id="taskSphere" class="input" style="flex:1"></select>
-            <button id="taskSave" class="btn small">Сохранить</button>
-          </div>
-          <div class="muted" style="font-size:12px;margin-top:8px">XP за задачу: <b id="taskXp">10</b></div>
-        </div>
-
-        <div id="taskList" class="list" style="margin-top:12px"></div>
-      </div>
-    </section>
-
-    <!-- PROFILE -->
-    <section id="profile" class="grid hidden">
-      <div class="card">
-        <div class="row between">
-          <div>
-            <div style="font-weight:900;font-size:18px">Профиль</div>
-            <div class="muted" style="margin-top:4px">настройки персонажа</div>
-          </div>
-          <button id="resetBtn" class="btn ghost small">Сброс UI</button>
-        </div>
-
-        <div style="margin-top:12px">
-          <div class="muted" style="font-size:12px;margin-bottom:8px">Имя</div>
-          <input id="profileName" class="input" maxlength="24" placeholder="Имя" />
-          <button id="saveNameBtn" class="btn small" style="margin-top:10px">Сохранить имя</button>
-        </div>
-
-        <div class="card" style="margin-top:12px;background:rgba(0,0,0,.16)">
-          <div class="muted" style="font-size:12px">Тех-инфа</div>
-          <div style="margin-top:8px;font-size:13px">
-            <div><span class="muted">ID:</span> <span id="dbgId"></span></div>
-            <div><span class="muted">Origin:</span> <span id="dbgOrigin"></span></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
+    <div class="level-badge">🛡 <span id="lvBadge">Уровень 1</span></div>
   </div>
-
-  <div class="nav">
-    <div class="bar">
-      <div class="tab on" data-tab="home">🏠<div>Дом</div></div>
-      <div class="tab" data-tab="goals">🎯<div>Цели</div></div>
-      <div class="tab" data-tab="tasks">📅<div>Задачи</div></div>
-      <div class="tab" data-tab="profile">⚙️<div>Профиль</div></div>
+  <div class="xp-section">
+    <div class="xp-header">
+      <span id="xpLabel">0 XP</span>
+      <span id="xpMax" style="color:var(--muted);">до Ур.2: 100 XP</span>
     </div>
+    <div class="xp-bar-bg"><div class="xp-bar-fill" id="xpFill" style="width:0%;"></div></div>
   </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="statS">🔥 0</div><div class="stat-lbl">Стрик</div></div>
+    <div class="stat-card"><div class="stat-val" id="statD">0/0</div><div class="stat-lbl">Задачи</div></div>
+    <div class="stat-card"><div class="stat-val" id="statR">#—</div><div class="stat-lbl">Ранг</div></div>
+  </div>
+  <div class="card" style="padding:18px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;">Сегодня</div>
+      <div style="font-size:20px;cursor:pointer;color:var(--muted);" onclick="openModal('mAddTask')">＋</div>
+    </div>
+    <div id="taskList"><div style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0;">Нет задач на сегодня</div></div>
+    <button class="btn btn-primary" style="padding:13px;margin-top:14px;" onclick="completeAll()">Выполнить всё ✓</button>
+  </div>
+</div>
 
-  <div id="toast" class="toast">
-    <b id="toastTitle">...</b>
-    <small id="toastMsg">...</small>
+<!-- S9 LEADERBOARD -->
+<div class="screen" id="s9" style="justify-content:flex-start;padding-bottom:88px;gap:12px;">
+  <div class="shead">
+    <div style="font-family:'Unbounded',sans-serif;font-size:17px;font-weight:800;flex:1;">🏆 Топ игроков</div>
   </div>
+  <div class="top3" id="top3">
+    <div style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0;width:100%;">Загрузка...</div>
+  </div>
+  <div id="lbList" style="width:100%;display:flex;flex-direction:column;gap:8px;"></div>
+</div>
+
+<!-- S10 GOALS -->
+<div class="screen" id="s10" style="justify-content:flex-start;padding-bottom:88px;gap:10px;">
+  <div class="shead"><div style="font-family:'Unbounded',sans-serif;font-size:17px;font-weight:800;">🎯 Мои цели</div></div>
+  <div id="goalsList" style="width:100%;display:flex;flex-direction:column;gap:10px;"></div>
+  <button class="add-dashed" onclick="openModal('mAddGoal')">＋ Добавить цель</button>
+</div>
+
+<!-- S11 TASKS -->
+<div class="screen" id="s11" style="justify-content:flex-start;padding-bottom:88px;gap:10px;">
+  <div class="shead"><div style="font-family:'Unbounded',sans-serif;font-size:17px;font-weight:800;">📋 Задачи</div></div>
+  <div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterTasks('all',this)">Все</button>
+    <button class="filter-tab" onclick="filterTasks('active',this)">Активные</button>
+    <button class="filter-tab" onclick="filterTasks('done',this)">Готово</button>
+  </div>
+  <div id="fullTaskList" style="width:100%;display:flex;flex-direction:column;gap:8px;"></div>
+  <button class="add-dashed" onclick="openModal('mAddTask')">＋ Добавить задачу</button>
+</div>
+
+<!-- S12 SETTINGS -->
+<div class="screen" id="s12" style="justify-content:flex-start;padding-bottom:88px;gap:12px;">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 0 8px;width:100%;">
+    <div class="settings-av" id="sAv">А</div>
+    <div style="font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;" id="sUN">—</div>
+    <div style="font-size:13px;color:var(--muted);" id="sLV">Уровень 1 · 0 XP</div>
+  </div>
+  <div class="slabel">Бейджики</div>
+  <div class="badge-row">
+    <div class="badge2 earned" onclick="showToast('🔥 Разблокировано!','7 дней подряд')"><div class="badge2-icon">🔥</div><div class="badge2-lbl">7 дней</div></div>
+    <div class="badge2" onclick="showToast('⚡ Нужно 30 дней','Продолжай!')"><div class="badge2-icon" style="filter:grayscale(1);opacity:0.35;">⚡</div><div class="badge2-lbl">30 дней</div></div>
+    <div class="badge2" onclick="showToast('🏆 Попади в Топ-10','Рейтинг')"><div class="badge2-icon" style="filter:grayscale(1);opacity:0.35;">🏆</div><div class="badge2-lbl">Топ-10</div></div>
+    <div class="badge2" onclick="showToast('⚔️ Выиграй дуэль','Сразись!')"><div class="badge2-icon" style="filter:grayscale(1);opacity:0.35;">⚔️</div><div class="badge2-lbl">Дуэлянт</div></div>
+  </div>
+  <div class="slabel">Уведомления</div>
+  <div class="settings-item" onclick="toggleNotif('morning','tM')">
+    <div class="s-icon">🌅</div>
+    <div class="s-info"><div class="s-name">Утром — 08:00</div><div class="s-sub">Начни день с целей</div></div>
+    <div class="toggle on" id="tM"><div class="toggle-knob"></div></div>
+  </div>
+  <div class="settings-item" onclick="toggleNotif('noon','tN')">
+    <div class="s-icon">☀️</div>
+    <div class="s-info"><div class="s-name">Полдень — 13:00</div><div class="s-sub">Проверь прогресс</div></div>
+    <div class="toggle" id="tN"><div class="toggle-knob"></div></div>
+  </div>
+  <div class="settings-item" onclick="toggleNotif('evening','tE')">
+    <div class="s-icon">🌙</div>
+    <div class="s-info"><div class="s-name">Вечером — 21:00</div><div class="s-sub">Подведи итог дня</div></div>
+    <div class="toggle on" id="tE"><div class="toggle-knob"></div></div>
+  </div>
+  <div class="slabel">Аккаунт</div>
+  <div class="settings-item" onclick="openModal('mEditProfile')">
+    <div class="s-icon">✏️</div>
+    <div class="s-info"><div class="s-name">Изменить профиль</div></div>
+    <div class="s-arrow">›</div>
+  </div>
+  <div class="settings-item" onclick="showToast('📣 Уже подписан!','@protocol2_app')">
+    <div class="s-icon">📣</div>
+    <div class="s-info"><div class="s-name">Telegram канал</div><div class="s-sub">@protocol2_app</div></div>
+    <div class="s-arrow">›</div>
+  </div>
+  <div class="settings-item" onclick="showToast('🔗 Скопировано!','+50 XP за друга')">
+    <div class="s-icon">🎁</div>
+    <div class="s-info"><div class="s-name">Пригласить друга</div><div class="s-sub">+50 XP за приглашение</div></div>
+    <div class="s-arrow">›</div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav" id="bottomNav">
+  <button class="nav-item" id="nav-s8" onclick="switchTab('s8')"><div class="nav-icon">🏠</div><div class="nav-label">Главная</div></button>
+  <button class="nav-item" id="nav-s9" onclick="switchTab('s9')"><div class="nav-icon">🏆</div><div class="nav-label">Топ</div></button>
+  <button class="nav-item" id="nav-s10" onclick="switchTab('s10')"><div class="nav-icon">🎯</div><div class="nav-label">Цели</div></button>
+  <button class="nav-item" id="nav-s11" onclick="switchTab('s11')"><div class="nav-icon">📋</div><div class="nav-label">Задачи</div></button>
+  <button class="nav-item" id="nav-s12" onclick="switchTab('s12')"><div class="nav-icon">⚙️</div><div class="nav-label">Настройки</div></button>
+</div>
+
+<!-- MODALS -->
+<div class="modal" id="mAddTask">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-close" onclick="closeModal('mAddTask')">✕</div>
+    <div class="modal-title">Новая задача</div>
+    <input class="input" id="newTaskName" type="text" placeholder="Название задачи" style="margin-bottom:12px;">
+    <div style="display:flex;gap:8px;margin-bottom:20px;">
+      <select class="input" id="newTaskSph" style="flex:1;padding:12px 14px;cursor:pointer;"></select>
+      <input class="input" id="newTaskXp" type="number" placeholder="XP" value="10" style="width:80px;padding:12px 14px;">
+    </div>
+    <button class="btn btn-primary" onclick="addTask()">Добавить задачу</button>
+  </div>
+</div>
+
+<div class="modal" id="mAddGoal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-close" onclick="closeModal('mAddGoal')">✕</div>
+    <div class="modal-title">Новая цель</div>
+    <select class="input" id="newGoalSph" style="margin-bottom:12px;cursor:pointer;"></select>
+    <input class="input" id="newGoalName" type="text" placeholder="Название цели" style="margin-bottom:20px;">
+    <button class="btn btn-primary" onclick="addGoalApi()">Создать цель</button>
+  </div>
+</div>
+
+<div class="modal" id="mEditProfile">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-close" onclick="closeModal('mEditProfile')">✕</div>
+    <div class="modal-title">Редактировать профиль</div>
+    <input class="input" id="editName" type="text" placeholder="Имя" style="margin-bottom:20px;">
+    <button class="btn btn-primary" onclick="saveProfile()">Сохранить</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-val" id="tVal">+10 XP</div>
+  <div class="toast-lbl" id="tLbl">Задача выполнена!</div>
+</div>
 
 <script>
-/* =========================
-   Telegram + Stable USER_ID
-========================= */
-const tg = window.Telegram?.WebApp;
-tg?.ready?.();
-tg?.expand?.();
+// ── CONFIG ──
+const SPHERES = ['Тело','Разум','Финансы','Образование','Дисциплина','Духовность','Отношения','Топ. жизнь'];
+const COLORS = { 'Тело':'#f97316','Разум':'#8b5cf6','Финансы':'#4ade80','Образование':'#60a5fa','Дисциплина':'#f59e0b','Духовность':'#a78bfa','Отношения':'#ec4899','Топ. жизнь':'#ef4444' };
+const RANKS = ['Новобранец','Ученик','Воин','Ветеран','Чемпион','Легенда'];
 
-let USER_ID = null;
-const tgUser = tg?.initDataUnsafe?.user;
-if (tgUser?.id) {
-  USER_ID = String(tgUser.id);
-} else {
-  // Telegram WebView can drop storage, but this keeps browser stable
-  let local = localStorage.getItem("proto_uid");
-  if(!local){
-    local = "u" + Math.floor(Math.random()*999999999);
-    localStorage.setItem("proto_uid", local);
+// Telegram user ID
+window.Telegram.WebApp.expand();
+const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+const USER_ID = tgUser?.id ? String(tgUser.id) : 'demo_' + Math.random().toString(36).substr(2,9);
+const API = window.location.origin;
+
+// ── STATE ──
+let S = { name:'', xp:0, level:1, streak:0, spheres:[], goals:[], tasks:[], goalIdx:0 };
+
+// ── INIT ──
+async function init() {
+  // populate selects
+  SPHERES.forEach(s => {
+    ['newTaskSph','newGoalSph'].forEach(id => {
+      const sel = document.getElementById(id);
+      if(sel) { const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); }
+    });
+  });
+
+  try {
+    const user = await apiGet('/api/user/' + USER_ID);
+    if(user && user.telegram_id) {
+      // existing user — go to dashboard
+      S.name = user.name || tgUser?.first_name || 'Игрок';
+      S.xp = user.xp || 0;
+      S.level = user.level || 1;
+      S.streak = user.streak || 0;
+      document.getElementById('loadingScreen').style.display = 'none';
+      goToApp();
+    } else {
+      // new user
+      S.name = tgUser?.first_name || '';
+      document.getElementById('nameInput').value = S.name;
+      document.getElementById('loadingScreen').style.display = 'none';
+      nav('s1');
+    }
+  } catch(e) {
+    document.getElementById('loadingScreen').style.display = 'none';
+    nav('s1');
   }
-  USER_ID = local;
-}
-document.getElementById('uid').textContent = USER_ID;
-
-/* =========================
-   Helpers
-========================= */
-const $ = (id)=>document.getElementById(id);
-const todayISO = ()=> new Date().toISOString().slice(0,10);
-
-function toast(title, msg){
-  const t = $('toast');
-  $('toastTitle').textContent = title;
-  $('toastMsg').textContent = msg || '';
-  t.style.display = 'block';
-  setTimeout(()=>{ t.style.display = 'none'; }, 1800);
 }
 
-window.addEventListener('error', (e)=>{
-  console.log('JS error:', e.message);
-  toast('Ошибка JS', e.message);
-});
+// ── API ──
+async function apiGet(url) {
+  const r = await fetch(API + url);
+  return r.json();
+}
+async function apiPost(url, data) {
+  const r = await fetch(API + url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+  return r.json();
+}
 
-async function api(path, method="GET", body=null){
-  const res = await fetch(path, {
-    method,
-    headers: { 'Content-Type':'application/json' },
-    body: body ? JSON.stringify(body) : null
-  });
-  const text = await res.text();
-  let data = null;
-  try { data = JSON.parse(text); } catch { data = { raw:text }; }
-  if(!res.ok){
-    const msg = data?.error || data?.message || ('HTTP '+res.status);
-    throw new Error(msg);
+// ── NAVIGATION ──
+const APP_SCREENS = ['s8','s9','s10','s11','s12'];
+function nav(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const bn = document.getElementById('bottomNav');
+  bn.style.display = APP_SCREENS.includes(id) ? 'flex' : 'none';
+}
+function setActiveNav(id) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('nav-' + id);
+  if(el) el.classList.add('active');
+}
+function switchTab(id) {
+  nav(id); setActiveNav(id);
+  if(id==='s9') renderLeaderboard();
+  if(id==='s10') renderGoals();
+  if(id==='s11') renderFullTasks('all');
+  if(id==='s12') refreshSettings();
+}
+
+// ── ONBOARDING ──
+function saveName() {
+  const v = document.getElementById('nameInput').value.trim();
+  if(v) S.name = v;
+  nav('s3');
+}
+function toggleSphere(btn) { btn.classList.toggle('sel'); }
+function saveSpheres() {
+  S.spheres = [...document.querySelectorAll('#sphereGrid .sphere-btn.sel')].map(b => b.dataset.s);
+  if(!S.spheres.length) { showToast('⚠️ Выбери сферу','хотя бы одну'); return; }
+  S.goalIdx = 0;
+  showGoalStep();
+}
+function showGoalStep() {
+  if(S.goalIdx >= S.spheres.length) { nav('s6'); return; }
+  document.getElementById('goalStep').textContent = `Шаг ${S.goalIdx+1} из ${S.spheres.length}`;
+  const sph = S.spheres[S.goalIdx];
+  document.getElementById('goalSphLabel').textContent = 'Сфера: ' + sph;
+  document.getElementById('goalSphLabel').style.color = COLORS[sph] || 'var(--accent2)';
+  document.getElementById('goalInput').value = '';
+  nav('s5');
+}
+function saveGoal() {
+  const v = document.getElementById('goalInput').value.trim();
+  if(v) S.goals.push({ sphere:S.spheres[S.goalIdx], name:v, progress:0 });
+  S.goalIdx++;
+  showGoalStep();
+}
+async function saveFirstTask() {
+  const v = document.getElementById('taskInput').value.trim();
+  if(v) S.tasks.push({ name:v, sphere:S.spheres[0]||'Тело', xp:10, done:false });
+  nav('s7');
+}
+
+async function goToApp() {
+  // create/sync user
+  await apiPost('/api/user/' + USER_ID + '/sync', { name: S.name || tgUser?.first_name || 'Игрок' });
+
+  // save goals from onboarding
+  for(const g of S.goals) {
+    await apiPost('/api/goals/' + USER_ID, { sphere:g.sphere, name:g.name });
   }
-  return data;
+  // save tasks from onboarding
+  for(const t of S.tasks) {
+    await apiPost('/api/tasks/' + USER_ID, { name:t.name, sphere:t.sphere, xp:t.xp });
+  }
+  S.goals = []; S.tasks = [];
+
+  // load fresh data
+  await loadUserData();
+  nav('s8'); setActiveNav('s8');
 }
 
-function rankName(level){
-  if(level>=25) return 'Легенда';
-  if(level>=15) return 'Элита';
-  if(level>=8)  return 'Профи';
-  if(level>=4)  return 'Ученик';
-  return 'Новичок';
+async function loadUserData() {
+  try {
+    const user = await apiGet('/api/user/' + USER_ID);
+    if(user && user.name) {
+      S.name = user.name; S.xp = user.xp||0; S.level = user.level||1; S.streak = user.streak||0;
+    }
+    S.tasks = await apiGet('/api/tasks/' + USER_ID);
+    updateUI();
+    renderTasks();
+  } catch(e) { console.error(e); }
 }
 
-function xpNeed(level){ return Math.max(100, level*100); }
-
-/* =========================
-   State
-========================= */
-let S = {
-  onboarded: false,
-  name: '',
-  level: 1,
-  xp: 0,
-  streak: 0,
-  spheres: ['Учёба','Спорт','Здоровье','Деньги','Навыки','Дисциплина'],
-  goals: [],
-  tasks: [],
-  selectedSphere: 'Учёба',
-};
-
-/* =========================
-   Render
-========================= */
-function showScreen(screenId){
-  ['onboarding','home','goals','tasks','profile'].forEach(id=>{
-    $(id).classList.toggle('hidden', id!==screenId);
-  });
-  document.querySelectorAll('.tab').forEach(el=>{
-    el.classList.toggle('on', el.dataset.tab===screenId);
-  });
+// ── UI UPDATE ──
+function updateUI() {
+  const needed = S.level * 100;
+  const pct = Math.min((S.xp / needed) * 100, 100);
+  safeSet('xpFill', el => el.style.width = pct + '%');
+  safeSet('xpLabel', el => el.textContent = S.xp + ' XP');
+  safeSet('xpMax', el => el.textContent = `до Ур.${S.level+1}: ${needed-S.xp} XP`);
+  safeSet('lvBadge', el => el.textContent = 'Уровень ' + S.level);
+  safeSet('rankTitle', el => el.textContent = RANKS[Math.min(S.level-1,RANKS.length-1)]);
+  safeSet('statS', el => el.textContent = '🔥 ' + S.streak);
+  const done = (S.tasks||[]).filter(t=>t.done||t.done===1).length;
+  safeSet('statD', el => el.textContent = `${done}/${(S.tasks||[]).length}`);
+  ['av','lbAv','sAv','dAv'].forEach(id => safeSet(id, el => el.textContent = (S.name||'?')[0].toUpperCase()));
+  ['dn','lbN','dName'].forEach(id => safeSet(id, el => el.textContent = id==='lbN'?S.name+' (Ты)':S.name));
+  safeSet('sAv', el => el.textContent = (S.name||'?')[0].toUpperCase());
+  safeSet('sUN', el => el.textContent = S.name);
+  safeSet('sLV', el => el.textContent = `Уровень ${S.level} · ${S.xp} XP`);
 }
+function safeSet(id, fn) { const el=document.getElementById(id); if(el) fn(el); }
 
-function renderHome(){
-  $('subtitle').textContent = S.onboarded ? 'система прокачки в деле' : 'создай персонажа';
-  $('heroTitle').textContent = S.name ? ('⚡ '+S.name) : 'Игрок';
-  $('rankTag').textContent = rankName(S.level);
-
-  $('lvl').textContent = String(S.level);
-  $('streak').textContent = String(S.streak);
-
-  const need = xpNeed(S.level);
-  $('xpText').textContent = `${S.xp} / ${need}`;
-  $('xpBar').style.width = Math.max(0, Math.min(100, Math.round((S.xp/need)*100))) + '%';
-
-  const done = S.tasks.filter(t=>t.done).length;
-  $('todayDone').textContent = String(done);
-
-  // spheres list
-  const wrap = $('sphereList');
-  wrap.innerHTML = '';
-  S.spheres.forEach(sp=>{
-    const countGoals = S.goals.filter(g=>g.sphere===sp).length;
-    const doneTasks = S.tasks.filter(t=>t.sphere===sp && t.done).length;
-    const totalTasks = S.tasks.filter(t=>t.sphere===sp).length;
-    const el = document.createElement('div');
-    el.className = 'item';
-    el.innerHTML = `
-      <div>
-        <div class="title">${sp}</div>
-        <div class="sub">${countGoals} целей • ${doneTasks}/${totalTasks} задач</div>
-      </div>
-      <div class="tag">${sp===S.selectedSphere ? 'выбрано' : 'выбрать'}</div>
-    `;
-    el.onclick = ()=>{
-      S.selectedSphere = sp;
-      toast('Сфера', 'Выбрано: '+sp);
-      renderHome();
-    };
-    wrap.appendChild(el);
-  });
-}
-
-function renderGoals(){
-  // sphere selects
-  const sel = $('goalSphere');
-  sel.innerHTML = '';
-  S.spheres.forEach(sp=>{
-    const o = document.createElement('option');
-    o.value = sp; o.textContent = sp;
-    sel.appendChild(o);
-  });
-  sel.value = S.selectedSphere || S.spheres[0];
-
-  const list = $('goalList');
+// ── TASKS ──
+function renderTasks() {
+  const list = document.getElementById('taskList');
+  if(!list) return;
+  if(!S.tasks || !S.tasks.length) { list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0;">Нет задач на сегодня</div>'; return; }
   list.innerHTML = '';
-  const items = S.goals.slice().sort((a,b)=> (b.updated_at||'').localeCompare(a.updated_at||''));
-  if(items.length===0){
-    const empty = document.createElement('div');
-    empty.className = 'muted';
-    empty.style.padding = '8px 2px';
-    empty.textContent = 'Пока нет целей. Добавь первую.';
-    list.appendChild(empty);
-    return;
-  }
-  items.forEach(g=>{
-    const el = document.createElement('div');
-    el.className = 'item';
-    const pct = Math.max(0, Math.min(100, Number(g.progress)||0));
-    el.innerHTML = `
-      <div style="flex:1">
-        <div class="title">${g.name}</div>
-        <div class="sub">${g.sphere} • ${pct}%</div>
-        <div class="progress" style="margin-top:8px;height:10px"><div class="bar" style="width:${pct}%"></div></div>
-      </div>
-      <div style="display:grid;gap:8px">
-        <button class="btn secondary small" data-act="plus">+10%</button>
-        <button class="btn ghost small" data-act="del">🗑</button>
-      </div>
-    `;
-    el.querySelector('[data-act="plus"]').onclick = async (ev)=>{
-      ev.stopPropagation();
-      try{
-        await api(`/api/goals/${USER_ID}/${g.id}`, 'PATCH', { delta: 10 });
-        await refreshAll();
-        toast('Прогресс', '+10%');
-      }catch(e){ toast('Не сохранилось', e.message); }
+  S.tasks.slice(0,5).forEach((t,i) => {
+    const isDone = t.done===1||t.done===true;
+    const row = document.createElement('div');
+    row.className = 'task-row';
+    row.innerHTML = `<div class="task-check${isDone?' done':''}">${isDone?'✓':(i+1)}</div><div class="task-text${isDone?' done':''}">${t.name}</div><div class="task-xp">+${t.xp||10} XP</div>`;
+    row.onclick = async () => {
+      if(!isDone) {
+        t.done = true;
+        await apiPost('/api/tasks/'+USER_ID+'/complete/'+t.id, { amount: t.xp||10 });
+        const u = await apiGet('/api/user/'+USER_ID);
+        S.xp=u.xp; S.level=u.level;
+        updateUI(); renderTasks();
+        showToast('+'+(t.xp||10)+' XP','✅ Выполнено!');
+      }
     };
-    el.querySelector('[data-act="del"]').onclick = async (ev)=>{
-      ev.stopPropagation();
-      try{
-        await api(`/api/goals/${USER_ID}/${g.id}`, 'DELETE');
-        await refreshAll();
-        toast('Удалено', g.name);
-      }catch(e){ toast('Не удалилось', e.message); }
+    list.appendChild(row);
+  });
+}
+
+async function completeAll() {
+  let gained = 0;
+  for(const t of S.tasks) {
+    if(!(t.done===1||t.done===true)) {
+      t.done = true;
+      await apiPost('/api/tasks/'+USER_ID+'/complete/'+t.id, { amount:t.xp||10 });
+      gained += t.xp||10;
+    }
+  }
+  const u = await apiGet('/api/user/'+USER_ID);
+  S.xp=u.xp; S.level=u.level;
+  updateUI(); renderTasks();
+  if(gained>0) showToast('+'+ gained+' XP','🎉 Все задачи!');
+  else showToast('✅ Уже всё!','Молодец!');
+}
+
+async function addTask() {
+  const name = document.getElementById('newTaskName').value.trim();
+  const sphere = document.getElementById('newTaskSph').value;
+  const xp = parseInt(document.getElementById('newTaskXp').value)||10;
+  if(!name){ showToast('⚠️','Введи название'); return; }
+  await apiPost('/api/tasks/'+USER_ID, { name, sphere, xp });
+  document.getElementById('newTaskName').value = '';
+  closeModal('mAddTask');
+  S.tasks = await apiGet('/api/tasks/'+USER_ID);
+  renderTasks(); renderFullTasks('all');
+  showToast('✅ Добавлено', name);
+}
+
+function renderFullTasks(filter) {
+  const list = document.getElementById('fullTaskList');
+  if(!list) return;
+  list.innerHTML = '';
+  const filtered = (S.tasks||[]).filter(t =>
+    filter==='all' || (filter==='active'&&!(t.done===1||t.done===true)) || (filter==='done'&&(t.done===1||t.done===true))
+  );
+  filtered.forEach(t => {
+    const isDone = t.done===1||t.done===true;
+    const color = COLORS[t.sphere]||'#7B6EF6';
+    const row = document.createElement('div');
+    row.className = 'task-full-row';
+    row.innerHTML = `<div class="task-sphere-dot" style="background:${color};"></div><div class="task-full-info"><div class="task-full-name" style="${isDone?'text-decoration:line-through;opacity:0.5;':''}">${t.name}</div><div class="task-full-sub">${t.sphere} · +${t.xp||10} XP</div></div><div class="task-full-check${isDone?' done':''}">${isDone?'✓':''}</div>`;
+    row.onclick = async () => {
+      if(!isDone) {
+        t.done = true;
+        await apiPost('/api/tasks/'+USER_ID+'/complete/'+t.id, { amount:t.xp||10 });
+        const u = await apiGet('/api/user/'+USER_ID);
+        S.xp=u.xp; S.level=u.level;
+        updateUI(); renderFullTasks(filter); renderTasks();
+        showToast('+'+(t.xp||10)+' XP','✅ Выполнено!');
+      }
+    };
+    list.appendChild(row);
+  });
+}
+
+function filterTasks(f,btn) {
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderFullTasks(f);
+}
+
+// ── GOALS ──
+async function renderGoals() {
+  const list = document.getElementById('goalsList');
+  if(!list) return;
+  const goals = await apiGet('/api/goals/'+USER_ID);
+  list.innerHTML = '';
+  goals.forEach(g => {
+    const color = COLORS[g.sphere]||'#7B6EF6';
+    const el = document.createElement('div');
+    el.className = 'goal-item';
+    el.innerHTML = `<div class="goal-sphere-tag" style="color:${color};">${g.sphere}</div><div class="goal-name2">${g.name}</div><div class="goal-prog-bg"><div class="goal-prog-fill" style="width:${g.progress||0}%;background:${color};"></div></div><div class="goal-prog-lbl">${g.progress||0}% выполнено</div>`;
+    el.onclick = async () => {
+      const np = Math.min(100,(g.progress||0)+10);
+      await apiPost('/api/goals/'+USER_ID+'/progress/'+g.id, { progress:np });
+      g.progress = np; el.querySelector('.goal-prog-fill').style.width=np+'%'; el.querySelector('.goal-prog-lbl').textContent=np+'% выполнено';
+      showToast('📈 +10%', g.name);
     };
     list.appendChild(el);
   });
+  if(!goals.length) list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0;">Нет целей</div>';
 }
 
-function renderTasks(){
-  // sphere select
-  const sel = $('taskSphere');
-  sel.innerHTML = '';
-  S.spheres.forEach(sp=>{
-    const o = document.createElement('option');
-    o.value = sp; o.textContent = sp;
-    sel.appendChild(o);
-  });
-  sel.value = S.selectedSphere || S.spheres[0];
-
-  const list = $('taskList');
-  list.innerHTML = '';
-  const items = S.tasks.slice().sort((a,b)=> (a.done===b.done)?0:(a.done?1:-1));
-  if(items.length===0){
-    const empty = document.createElement('div');
-    empty.className = 'muted';
-    empty.style.padding = '8px 2px';
-    empty.textContent = 'Пока нет задач на сегодня.';
-    list.appendChild(empty);
-    return;
-  }
-  items.forEach(t=>{
-    const el = document.createElement('div');
-    el.className = 'item';
-    const status = t.done ? 'готово' : `+${t.xp||10} XP`;
-    el.innerHTML = `
-      <div>
-        <div class="title">${t.name}</div>
-        <div class="sub">${t.sphere} • ${status}</div>
-      </div>
-      <div class="tag">${t.done ? '✅' : 'Сделать'}</div>
-    `;
-    el.onclick = async ()=>{
-      if(t.done) return;
-      try{
-        await api(`/api/tasks/${USER_ID}/complete/${t.id}`, 'POST', { amount: t.xp||10 });
-        await refreshAll();
-        toast('Задача', 'Готово +XP');
-      }catch(e){ toast('Не сохранилось', e.message); }
-    };
-    list.appendChild(el);
-  });
-}
-
-/* =========================
-   Data sync
-========================= */
-async function refreshAll(){
-  // Ensure user exists
-  await api('/api/user', 'POST', { id: USER_ID, name: S.name || 'User' });
-
-  const user = await api('/api/user/' + USER_ID);
-  S.onboarded = !!user.onboarded;
-  S.name = user.name || S.name;
-  S.level = Number(user.level)||1;
-  S.xp = Number(user.xp)||0;
-  S.streak = Number(user.streak)||0;
-
-  // spheres stored as json array
-  if(Array.isArray(user.spheres) && user.spheres.length){
-    S.spheres = user.spheres;
-    if(!S.spheres.includes(S.selectedSphere)) S.selectedSphere = S.spheres[0];
-  }
-
-  S.goals = await api('/api/goals/' + USER_ID);
-  S.tasks = await api('/api/tasks/' + USER_ID);
-
-  // profile
-  $('profileName').value = S.name || '';
-  $('dbgId').textContent = USER_ID;
-  $('dbgOrigin').textContent = window.location.origin;
-
-  renderHome();
+async function addGoalApi() {
+  const sphere = document.getElementById('newGoalSph').value;
+  const name = document.getElementById('newGoalName').value.trim();
+  if(!name){ showToast('⚠️','Введи название'); return; }
+  await apiPost('/api/goals/'+USER_ID, { sphere, name });
+  document.getElementById('newGoalName').value = '';
+  closeModal('mAddGoal');
   renderGoals();
-  renderTasks();
+  showToast('🎯 Цель добавлена', name);
 }
 
-/* =========================
-   Onboarding
-========================= */
-const defaultSpheres = ['Учёба','Спорт','Здоровье','Навыки','Деньги','Отношения','Дисциплина','Внешность','Сон','Питание'];
+// ── LEADERBOARD ──
+async function renderLeaderboard() {
+  const data = await apiGet('/api/leaderboard');
+  const top3El = document.getElementById('top3');
+  const lbEl = document.getElementById('lbList');
+  if(!data||!data.length) { top3El.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;width:100%;">Пока пусто</div>'; return; }
 
-function renderOnboarding(){
-  const chips = $('chips');
-  chips.innerHTML = '';
-  const chosen = new Set(S.spheres || []);
-  defaultSpheres.forEach(sp=>{
-    const c = document.createElement('div');
-    c.className = 'chip' + (chosen.has(sp) ? ' on' : '');
-    c.textContent = sp;
-    c.onclick = ()=>{
-      if(chosen.has(sp)) chosen.delete(sp); else chosen.add(sp);
-      S.spheres = Array.from(chosen);
-      renderOnboarding();
-    };
-    chips.appendChild(c);
+  const medals = ['🥇','🥈','🥉'];
+  const pClasses = ['p1','p2','p3'];
+  const avClasses = ['r1','r2','r3'];
+  const heights = [56,44,34];
+  const order = data.length>=3 ? [1,0,2] : [0,1,2];
+  const top = data.slice(0,3);
+
+  top3El.innerHTML = '';
+  order.forEach(idx => {
+    if(!top[idx]) return;
+    const u = top[idx];
+    const div = document.createElement('div');
+    div.className = 'top-item';
+    div.innerHTML = `<div class="top-av ${avClasses[idx]}">${(u.name||'?')[0].toUpperCase()}</div><div style="font-size:18px;">${medals[idx]}</div><div class="top-uname">${u.name}</div><div class="top-xp2">${u.xp} XP</div><div class="pedestal ${pClasses[idx]}">${idx+1}</div>`;
+    top3El.appendChild(div);
   });
-  $('nameInput').value = S.name || '';
-}
 
-async function completeOnboarding(){
-  const name = $('nameInput').value.trim();
-  const spheres = (S.spheres || []).filter(Boolean);
-  if(!name){
-    toast('Имя', 'Введи имя');
-    return;
-  }
-  if(spheres.length < 3){
-    toast('Сферы', 'Выбери минимум 3');
-    return;
-  }
-  try{
-    await api(`/api/user/${USER_ID}/onboarding`, 'POST', { name, spheres });
-    await refreshAll();
-    showScreen('home');
-    toast('Готово', 'Персонаж создан');
-  }catch(e){
-    toast('Не сохранилось', e.message);
-  }
-}
-
-/* =========================
-   Events
-========================= */
-document.querySelectorAll('.tab').forEach(el=>{
-  el.addEventListener('click', ()=>{
-    const tab = el.dataset.tab;
-    showScreen(tab);
+  lbEl.innerHTML = '';
+  data.forEach((u,i) => {
+    const isMe = u.telegram_id === USER_ID;
+    const div = document.createElement('div');
+    div.className = 'lb-item' + (isMe?' me':'');
+    div.innerHTML = `<div class="lb-rank">${i+1}</div><div class="lb-av">${(u.name||'?')[0].toUpperCase()}</div><div class="lb-info"><div class="lb-name">${u.name}${isMe?' (Ты)':''}</div><div class="lb-streak">🔥 ${u.streak||0} дн.</div></div><div class="lb-xp2">${u.xp} XP</div>`;
+    lbEl.appendChild(div);
   });
+}
+
+// ── SETTINGS ──
+function refreshSettings() {
+  safeSet('sAv', el => el.textContent = (S.name||'?')[0].toUpperCase());
+  safeSet('sUN', el => el.textContent = S.name);
+  safeSet('sLV', el => el.textContent = `Уровень ${S.level} · ${S.xp} XP`);
+}
+
+function toggleNotif(name, id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('on');
+  const on = el.classList.contains('on');
+  const times = { morning:'08:00', noon:'13:00', evening:'21:00' };
+  showToast(on?'🔔 Включено':'🔕 Выключено', times[name]||'');
+}
+
+async function saveProfile() {
+  const v = document.getElementById('editName').value.trim();
+  if(v) {
+    S.name = v;
+    await apiPost('/api/user/'+USER_ID+'/name', { name:v });
+    updateUI(); refreshSettings();
+  }
+  closeModal('mEditProfile');
+  showToast('✅ Сохранено','');
+}
+
+// ── MODALS ──
+function openModal(id) {
+  if(id==='mEditProfile') safeSet('editName', el => el.value=S.name);
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+
+// ── TOAST ──
+function showToast(val, lbl) {
+  safeSet('tVal', el => el.textContent=val);
+  safeSet('tLbl', el => el.textContent=lbl);
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+// ── RIPPLE ──
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn');
+  if(!btn) return;
+  const r = document.createElement('span');
+  r.className = 'ripple';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;`;
+  btn.appendChild(r);
+  setTimeout(()=>r.remove(), 500);
 });
 
-$('syncBtn').onclick = async ()=>{
-  try{ await refreshAll(); toast('Синк', 'Обновлено'); }catch(e){ toast('Ошибка', e.message); }
-};
-
-$('quickGoal').onclick = ()=>{ showScreen('goals'); $('goalForm').classList.remove('hidden'); $('goalName').focus(); };
-$('quickTask').onclick = ()=>{ showScreen('tasks'); $('taskForm').classList.remove('hidden'); $('taskName').focus(); };
-
-$('addGoalBtn').onclick = ()=> $('goalForm').classList.toggle('hidden');
-$('goalSave').onclick = async ()=>{
-  const name = $('goalName').value.trim();
-  const sphere = $('goalSphere').value;
-  if(!name) return toast('Цель', 'Введи название');
-  try{
-    await api(`/api/goals/${USER_ID}`, 'POST', { sphere, name });
-    $('goalName').value = '';
-    $('goalForm').classList.add('hidden');
-    await refreshAll();
-    toast('Цель', 'Сохранено');
-  }catch(e){ toast('Не сохранилось', e.message); }
-};
-
-$('addTaskBtn').onclick = ()=> $('taskForm').classList.toggle('hidden');
-$('taskSave').onclick = async ()=>{
-  const name = $('taskName').value.trim();
-  const sphere = $('taskSphere').value;
-  const xp = 10;
-  if(!name) return toast('Задача', 'Введи название');
-  try{
-    await api(`/api/tasks/${USER_ID}`, 'POST', { name, sphere, xp });
-    $('taskName').value = '';
-    $('taskForm').classList.add('hidden');
-    await refreshAll();
-    toast('Задача', 'Добавлено');
-  }catch(e){ toast('Не сохранилось', e.message); }
-};
-
-$('saveNameBtn').onclick = async ()=>{
-  const name = $('profileName').value.trim();
-  if(!name) return toast('Имя', 'Пусто');
-  try{
-    await api(`/api/user/${USER_ID}/onboarding`, 'POST', { name, spheres: S.spheres });
-    await refreshAll();
-    toast('Имя', 'Сохранено');
-  }catch(e){ toast('Ошибка', e.message); }
-};
-
-$('resetBtn').onclick = ()=>{
-  // UI reset only, data remains server-side
-  localStorage.removeItem('proto_uid');
-  toast('UI', 'Перезайди в мини-апп');
-};
-
-/* =========================
-   Boot
-========================= */
-(async ()=>{
-  // Show something fast
-  showScreen('home');
-  $('subtitle').textContent = 'подключаемся...';
-
-  // First sync
-  try{
-    await refreshAll();
-  }catch(e){
-    toast('Сервер', e.message);
-  }
-
-  if(!S.onboarded){
-    renderOnboarding();
-    showScreen('onboarding');
-  }else{
-    showScreen('home');
-  }
-
-  $('startBtn').onclick = completeOnboarding;
-  $('skipBtn').onclick = async ()=>{
-    // quick minimal onboarding
-    const name = $('nameInput').value.trim() || (tgUser?.first_name || 'Игрок');
-    const spheres = (S.spheres && S.spheres.length>=3) ? S.spheres : ['Учёба','Спорт','Дисциплина'];
-    try{
-      await api(`/api/user/${USER_ID}/onboarding`, 'POST', { name, spheres });
-      await refreshAll();
-      showScreen('home');
-      toast('Готово', 'Можно играть');
-    }catch(e){ toast('Ошибка', e.message); }
-  };
-})();
+// ── START ──
+init();
 </script>
 </body>
 </html>
