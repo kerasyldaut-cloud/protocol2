@@ -29,7 +29,7 @@ app.post(WEBHOOK_PATH, (req, res) => {
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
-););
+);
 
 // --- helpers ---
 const xpNeed = (lvl) => Math.max(100, lvl * 100);
