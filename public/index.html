@@ -365,6 +365,11 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
     <div class="toggle on" id="tE"><div class="toggle-knob"></div></div>
   </div>
   <div class="slabel">Аккаунт</div>
+  <div class="settings-item" onclick="openModal('mAddSphere')">
+    <div class="s-icon">🌐</div>
+    <div class="s-info"><div class="s-name">Добавить сферу</div><div class="s-sub">Своя сфера для прокачки</div></div>
+    <div class="s-arrow">›</div>
+  </div>
   <div class="settings-item" onclick="openModal('mEditProfile')">
     <div class="s-icon">✏️</div>
     <div class="s-info"><div class="s-name">Изменить профиль</div></div>
@@ -783,9 +788,13 @@ function renderFullTasks(filter) {
           <div class="task-full-sub">+${t.xp||10} XP</div>
         </div>
         <div class="task-actions">
-          <div class="icon-btn" onclick="openEditTaskModal(${JSON.stringify(t).replace(/"/g,'&quot;')})">✏️</div>
-          <div class="icon-btn del" onclick="deleteTask(${t.id})">🗑</div>
+          <div class="icon-btn" class="edit-task-btn">✏️</div>
+          <div class="icon-btn del" class="del-task-btn">🗑</div>
         </div>`;
+      if(row.querySelector('.edit-task-btn')) {
+        row.querySelector('.edit-task-btn').onclick = (e) => { e.stopPropagation(); openEditTaskModal(t); };
+        row.querySelector('.del-task-btn').onclick = (e) => { e.stopPropagation(); deleteTask(t.id); };
+      }
       row.querySelector('.task-full-check').onclick = async () => {
         if(!isDone) {
           t.done = true;
@@ -883,8 +892,8 @@ async function renderGoals() {
             <div class="goal-name2">${g.name}</div>
           </div>
           <div class="task-actions">
-            <div class="icon-btn" onclick="openEditGoalModal(${JSON.stringify(g).replace(/"/g,'&quot;')})">✏️</div>
-            <div class="icon-btn del" onclick="deleteGoal(${g.id})">🗑</div>
+            <div class="icon-btn" class="edit-goal-btn">✏️</div>
+            <div class="icon-btn del" class="del-goal-btn">🗑</div>
           </div>
         </div>
         <div class="goal-prog-bg"><div class="goal-prog-fill" id="gf${g.id}" style="width:${g.progress||0}%;background:${color};"></div></div>
@@ -892,6 +901,10 @@ async function renderGoals() {
           <div class="goal-prog-lbl" id="gl${g.id}">${g.progress||0}% выполнено</div>
           <div class="goal-prog-btn" onclick="incrementGoal(${g.id},${g.progress||0},'${color}')">+10%</div>
         </div>`;
+      if(el.querySelector('.edit-goal-btn')) {
+        el.querySelector('.edit-goal-btn').onclick = (e) => { e.stopPropagation(); openEditGoalModal(g); };
+        el.querySelector('.del-goal-btn').onclick = (e) => { e.stopPropagation(); deleteGoal(g.id); };
+      }
       section.appendChild(el);
     });
     list.appendChild(section);
@@ -1104,7 +1117,8 @@ async function sendAiMessage(forcedText) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 600,
+        max_tokens: 800,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
         system: `Ты Protocol AI — личный ИИ коуч в приложении для прокачки себя Protocol 2.0.
 Говори по-русски, молодёжно но по делу. Ты честный и прямой, не льстишь без причины.
 Максимум 150 слов. Используй эмодзи умеренно. Не используй markdown заголовки.
@@ -1115,7 +1129,7 @@ ${getUserContext()}`,
       })
     });
     const data = await resp.json();
-    const reply = data.content?.[0]?.text || 'Что-то пошло не так. Попробуй ещё раз.';
+    const reply = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('') || 'Что-то пошло не так. Попробуй ещё раз.';
     typingEl.remove();
     addAiMsg(reply, 'ai');
     aiHistory.push({ role:'assistant', content:reply });

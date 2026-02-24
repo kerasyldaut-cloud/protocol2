@@ -6,6 +6,7 @@ const cron = require('node-cron');
 const db = require('./database');
 
 const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+bot.on('polling_error', (err) => console.log('polling:', err.code));
 const app = express();
 app.use(cors());
 app.use(express.json());
