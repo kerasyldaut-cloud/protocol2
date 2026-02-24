@@ -34,55 +34,37 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
 .screen.active > *:nth-child(4){animation:slideIn 0.3s 0.15s ease forwards;opacity:0}
 .screen.active > *:nth-child(5){animation:slideIn 0.3s 0.2s ease forwards;opacity:0}
 .screen.active > *:nth-child(6){animation:slideIn 0.3s 0.25s ease forwards;opacity:0}
-.screen.active > *:nth-child(7){animation:slideIn 0.3s 0.3s ease forwards;opacity:0}
-.screen.active > *:nth-child(8){animation:slideIn 0.3s 0.35s ease forwards;opacity:0}
-
-/* TYPOGRAPHY */
 .h1 { font-family:'Unbounded',sans-serif; font-size:38px; font-weight:900; line-height:1.1; text-align:center; }
 .h2 { font-family:'Unbounded',sans-serif; font-size:26px; font-weight:800; line-height:1.2; text-align:center; }
 .grad-text { background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-
-/* BUTTONS */
-.btn { width:100%; padding:17px; border:none; border-radius:100px; font-family:'Manrope',sans-serif; font-size:16px; font-weight:700; cursor:pointer; transition:transform 0.12s,box-shadow 0.15s; position:relative; overflow:hidden; display:block; }
+.btn { width:100%; padding:17px; border:none; border-radius:100px; font-family:'Manrope',sans-serif; font-size:16px; font-weight:700; cursor:pointer; transition:transform 0.12s; position:relative; overflow:hidden; display:block; }
 .btn:active { transform:scale(0.96); }
 .btn-primary { background:var(--grad2); color:#fff; box-shadow:0 8px 32px rgba(123,110,246,0.45); }
-.btn-ghost { background:var(--card2); color:#fff; border:1px solid var(--border); backdrop-filter:blur(10px); }
-.btn-danger { background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.3); }
+.btn-ghost { background:var(--card2); color:#fff; border:1px solid var(--border); }
+.btn-sm { width:auto; padding:8px 16px; font-size:13px; }
+.btn-danger-sm { background:rgba(248,113,113,0.15); color:var(--red); border:1px solid rgba(248,113,113,0.3); width:auto; padding:8px 14px; border-radius:100px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif; }
+.btn-danger-sm:active { transform:scale(0.93); }
 .ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,0.22); transform:scale(0); animation:ripAnim 0.5s linear; pointer-events:none; }
 @keyframes ripAnim { to{transform:scale(4);opacity:0} }
-
-/* INPUT */
-.input { width:100%; padding:17px 20px; background:var(--card2); border:1px solid var(--border); border-radius:16px; color:#fff; font-family:'Manrope',sans-serif; font-size:15px; outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
+.input { width:100%; padding:17px 20px; background:var(--card2); border:1px solid var(--border); border-radius:16px; color:#fff; font-family:'Manrope',sans-serif; font-size:15px; outline:none; transition:border-color 0.2s; }
 .input::placeholder { color:var(--muted); }
 .input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(123,110,246,0.2); }
-
-/* CARD */
 .card { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:20px; padding:18px; }
-
-/* DOTS */
 .dots { display:flex; gap:6px; justify-content:center; }
 .dot { width:6px; height:6px; border-radius:3px; background:var(--muted); transition:all 0.3s; }
 .dot.on { width:20px; background:var(--accent); }
-
-/* BOTTOM NAV */
 .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(13,13,26,0.96); border-top:1px solid var(--border); display:none; padding:10px 8px 22px; gap:2px; backdrop-filter:blur(20px); z-index:50; }
 .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 4px; border-radius:14px; cursor:pointer; transition:all 0.2s; border:none; background:transparent; color:var(--muted); font-family:'Manrope',sans-serif; }
 .nav-item:active { transform:scale(0.90); }
 .nav-item.active { color:var(--accent2); background:rgba(123,110,246,0.12); }
 .nav-icon { font-size:20px; }
 .nav-label { font-size:10px; font-weight:600; }
-
-/* SPHERE GRID */
 .sphere-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; }
 .sphere-btn { padding:13px 14px; background:var(--card); border:1px solid var(--border); border-radius:100px; color:#fff; font-family:'Manrope',sans-serif; font-size:13px; font-weight:600; cursor:pointer; text-align:left; display:flex; align-items:center; gap:8px; transition:all 0.2s; }
 .sphere-btn.sel { background:rgba(123,110,246,0.25); border-color:var(--accent); color:var(--accent2); }
 .sphere-btn:active { transform:scale(0.95); }
-
-/* SUCCESS ORB */
-.success-orb { width:90px; height:90px; background:var(--card2); border:1px solid var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:40px; margin:0 auto; animation:pulseGlow 2s infinite; width:auto; }
+.success-orb { background:var(--card2); border:1px solid var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:40px; margin:0 auto; animation:pulseGlow 2s infinite; width:90px; height:90px; }
 @keyframes pulseGlow { 0%,100%{box-shadow:0 0 0 0 rgba(123,110,246,0.3)} 50%{box-shadow:0 0 0 20px rgba(123,110,246,0)} }
-
-/* DASHBOARD */
 .profile-row { display:flex; align-items:center; gap:12px; }
 .avatar { width:46px; height:46px; min-width:46px; border-radius:50%; background:var(--grad2); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; }
 .level-badge { padding:6px 14px; background:var(--card2); border:1px solid var(--border); border-radius:100px; font-size:12px; font-weight:700; display:flex; align-items:center; gap:5px; white-space:nowrap; margin-left:auto; }
@@ -94,14 +76,12 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
 .stat-card { flex:1; background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
 .stat-val { font-family:'Unbounded',sans-serif; font-size:16px; font-weight:900; color:var(--accent2); }
 .stat-lbl { font-size:10px; color:var(--muted); margin-top:3px; }
-
-/* TASKS */
-.task-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); cursor:pointer; transition:opacity 0.2s; }
+.task-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); cursor:pointer; }
 .task-row:last-of-type { border-bottom:none; }
 .task-row:active { opacity:0.7; }
-.task-check { width:26px; min-width:26px; height:26px; background:var(--card); border:1.5px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; transition:all 0.2s; }
+.task-check { width:26px; min-width:26px; height:26px; background:var(--card); border:1.5px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:12px; transition:all 0.2s; }
 .task-check.done { background:var(--accent); border-color:var(--accent); }
-.task-text { font-size:13px; color:rgba(255,255,255,0.8); transition:all 0.2s; flex:1; }
+.task-text { font-size:13px; color:rgba(255,255,255,0.8); flex:1; }
 .task-text.done { text-decoration:line-through; color:var(--muted); }
 .task-xp { font-size:11px; font-weight:700; color:var(--accent2); white-space:nowrap; }
 
@@ -126,34 +106,45 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
 .lb-name { font-size:13px; font-weight:600; }
 .lb-streak { font-size:11px; color:var(--muted); }
 .lb-xp2 { font-size:13px; font-weight:800; color:var(--accent2); white-space:nowrap; }
-.duel-chip { padding:5px 10px; background:rgba(248,113,113,0.15); border:1px solid rgba(248,113,113,0.3); border-radius:100px; color:var(--red); font-size:11px; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif; flex-shrink:0; }
-.duel-chip:active { transform:scale(0.9); }
 
-/* GOALS */
-.goal-item { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:18px; padding:16px; cursor:pointer; transition:border-color 0.2s; }
-.goal-item:active { transform:scale(0.98); }
-.goal-sphere-tag { font-size:11px; font-weight:700; margin-bottom:6px; }
-.goal-name2 { font-size:15px; font-weight:700; margin-bottom:10px; }
-.goal-prog-bg { height:6px; background:var(--card); border-radius:3px; overflow:hidden; margin-bottom:6px; }
-.goal-prog-fill { height:100%; border-radius:3px; transition:width 0.6s; }
-.goal-prog-lbl { font-size:11px; color:var(--muted); }
-.add-dashed { width:100%; padding:16px; background:var(--card); border:2px dashed var(--border); border-radius:18px; color:var(--muted); font-family:'Manrope',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; }
-.add-dashed:hover { border-color:var(--accent); color:var(--accent2); }
+/* SPHERE SECTIONS */
+.sphere-section { width:100%; margin-bottom:16px; }
+.sphere-section-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; padding:0 4px; }
+.sphere-dot { width:10px; height:10px; min-width:10px; border-radius:50%; }
+.sphere-section-title { font-family:'Unbounded',sans-serif; font-size:13px; font-weight:700; }
+.sphere-section-count { font-size:11px; color:var(--muted); margin-left:auto; }
 
-/* TASKS FULL */
-.task-full-row { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:all 0.2s; }
-.task-full-row:active { transform:scale(0.98); }
-.task-sphere-dot { width:10px; height:10px; min-width:10px; border-radius:50%; }
+/* TASK FULL ROW */
+.task-full-row { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px; margin-bottom:8px; }
 .task-full-info { flex:1; min-width:0; }
 .task-full-name { font-size:14px; font-weight:600; }
 .task-full-sub { font-size:12px; color:var(--muted); margin-top:2px; }
-.task-full-check { width:28px; height:28px; min-width:28px; background:var(--card); border:1.5px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+.task-full-check { width:28px; height:28px; min-width:28px; background:var(--card); border:1.5px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; }
 .task-full-check.done { background:var(--accent); border-color:var(--accent); }
-.filter-tabs { display:flex; gap:8px; width:100%; }
-.filter-tab { padding:8px 16px; background:var(--card); border:1px solid var(--border); border-radius:100px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; color:var(--muted); font-family:'Manrope',sans-serif; }
-.filter-tab.active { background:rgba(123,110,246,0.2); border-color:var(--accent); color:var(--accent2); }
+.task-actions { display:flex; gap:6px; flex-shrink:0; }
+.icon-btn { width:30px; height:30px; border-radius:9px; border:1px solid var(--border); background:var(--card); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; transition:all 0.2s; }
+.icon-btn:active { transform:scale(0.88); }
+.icon-btn.del { border-color:rgba(248,113,113,0.3); background:rgba(248,113,113,0.1); }
 
-/* SETTINGS */
+/* GOAL ITEM */
+.goal-item { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:18px; padding:16px; margin-bottom:10px; }
+.goal-item-header { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
+.goal-item-info { flex:1; }
+.goal-sphere-tag { font-size:11px; font-weight:700; margin-bottom:4px; }
+.goal-name2 { font-size:15px; font-weight:700; }
+.goal-prog-bg { height:6px; background:var(--card); border-radius:3px; overflow:hidden; margin-bottom:6px; }
+.goal-prog-fill { height:100%; border-radius:3px; transition:width 0.6s; }
+.goal-prog-row { display:flex; justify-content:space-between; align-items:center; }
+.goal-prog-lbl { font-size:11px; color:var(--muted); }
+.goal-prog-btn { font-size:11px; font-weight:700; color:var(--accent2); cursor:pointer; background:rgba(123,110,246,0.15); border:1px solid rgba(123,110,246,0.3); border-radius:100px; padding:4px 10px; }
+.goal-prog-btn:active { transform:scale(0.93); }
+
+.add-dashed { width:100%; padding:16px; background:var(--card); border:2px dashed var(--border); border-radius:18px; color:var(--muted); font-family:'Manrope',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+.add-dashed:active { border-color:var(--accent); color:var(--accent2); }
+.filter-tabs { display:flex; gap:8px; width:100%; overflow-x:auto; padding-bottom:2px; }
+.filter-tabs::-webkit-scrollbar { display:none; }
+.filter-tab { padding:8px 16px; background:var(--card); border:1px solid var(--border); border-radius:100px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; color:var(--muted); font-family:'Manrope',sans-serif; white-space:nowrap; flex-shrink:0; }
+.filter-tab.active { background:rgba(123,110,246,0.2); border-color:var(--accent); color:var(--accent2); }
 .settings-av { width:80px; height:80px; border-radius:50%; background:var(--grad2); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:700; border:3px solid var(--accent); margin:0 auto; }
 .slabel { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; width:100%; }
 .settings-item { display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--card2); border:1px solid var(--border); border-radius:16px; margin-bottom:8px; cursor:pointer; transition:background 0.2s; width:100%; }
@@ -165,7 +156,7 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
 .s-arrow { color:var(--muted); font-size:16px; }
 .toggle { width:44px; min-width:44px; height:26px; background:var(--card); border-radius:13px; position:relative; cursor:pointer; transition:background 0.3s; border:1px solid var(--border); }
 .toggle.on { background:var(--accent); }
-.toggle-knob { position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition:transform 0.3s; box-shadow:0 1px 4px rgba(0,0,0,0.3); }
+.toggle-knob { position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition:transform 0.3s; }
 .toggle.on .toggle-knob { transform:translateX(18px); }
 .badge-row { display:flex; gap:8px; width:100%; flex-wrap:wrap; }
 .badge2 { display:flex; flex-direction:column; align-items:center; gap:5px; padding:14px 8px; background:var(--card2); border:1px solid var(--border); border-radius:16px; flex:1; min-width:65px; cursor:pointer; transition:all 0.2s; }
@@ -174,39 +165,31 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
 .badge2-icon { font-size:24px; }
 .badge2-lbl { font-size:10px; font-weight:600; color:var(--muted); text-align:center; }
 .badge2.earned .badge2-lbl { color:var(--accent2); }
-
-/* MODAL */
 .modal { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:flex-end; z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; backdrop-filter:blur(4px); }
 .modal.open { opacity:1; pointer-events:all; }
-.modal-sheet { width:100%; background:#12122e; border-radius:28px 28px 0 0; padding:28px 22px 40px; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1); border-top:1px solid var(--border); }
+.modal-sheet { width:100%; background:#12122e; border-radius:28px 28px 0 0; padding:28px 22px 40px; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1); border-top:1px solid var(--border); position:relative; }
 .modal.open .modal-sheet { transform:translateY(0); }
 .modal-handle { width:40px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 24px; }
 .modal-title { font-family:'Unbounded',sans-serif; font-size:20px; font-weight:800; margin-bottom:20px; }
 .modal-close { position:absolute; top:20px; right:22px; width:32px; height:32px; background:var(--card2); border:1px solid var(--border); border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; }
 .modal-close:active { transform:scale(0.9); }
-
-/* TOAST */
 .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(16px); background:rgba(18,18,46,0.95); border:1px solid var(--border); border-radius:18px; padding:14px 22px; text-align:center; opacity:0; pointer-events:none; transition:all 0.3s; z-index:400; backdrop-filter:blur(20px); white-space:nowrap; }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 .toast-val { font-family:'Unbounded',sans-serif; font-size:22px; font-weight:900; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 .toast-lbl { font-size:12px; color:var(--muted); margin-top:2px; }
-
 .shead { display:flex; align-items:center; gap:12px; width:100%; margin-bottom:14px; flex-shrink:0; }
-.back-btn { width:36px; height:36px; min-width:36px; background:var(--card2); border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; }
-.back-btn:active { transform:scale(0.93); }
-
-::-webkit-scrollbar { width:3px; }
-::-webkit-scrollbar-thumb { background:var(--card2); border-radius:2px; }
-
-/* LOADING */
 .loading { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; gap:16px; }
 .loading-spinner { width:40px; height:40px; border:3px solid var(--card2); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
 @keyframes spin { to{transform:rotate(360deg)} }
+::-webkit-scrollbar { width:3px; }
+::-webkit-scrollbar-thumb { background:var(--card2); border-radius:2px; }
+.lb-toggle { display:flex; gap:8px; width:100%; margin-bottom:4px; }
+.lb-toggle-btn { flex:1; padding:10px; background:var(--card); border:1px solid var(--border); border-radius:100px; font-size:13px; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif; color:var(--muted); transition:all 0.2s; }
+.lb-toggle-btn.active { background:rgba(123,110,246,0.2); border-color:var(--accent); color:var(--accent2); }
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
 <div id="loadingScreen" class="loading">
   <div class="loading-spinner"></div>
   <div style="font-family:'Unbounded',sans-serif;font-size:14px;color:var(--muted);">Загрузка...</div>
@@ -215,7 +198,7 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
 <!-- S1 WELCOME -->
 <div class="screen" id="s1">
   <div class="glow-orb" style="width:300px;height:300px;background:rgba(123,110,246,0.18);bottom:0;left:50%;transform:translateX(-50%);"></div>
-  <div style="font-family:'Unbounded',sans-serif;font-size:11px;font-weight:600;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;text-align:center;margin-bottom:48px;margin-top:60px;">Protocol 2.0</div>
+  <div style="font-family:'Unbounded',sans-serif;font-size:11px;color:var(--accent2);letter-spacing:0.15em;text-transform:uppercase;text-align:center;margin-bottom:48px;margin-top:60px;">Protocol 2.0</div>
   <div class="h1 grad-text" style="margin-bottom:14px;">Добро<br>пожало&shy;вать</div>
   <div style="font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:52px;text-align:center;">Настроим твою систему<br>прокачки за 1 минуту</div>
   <div class="dots" style="margin-bottom:52px;"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
@@ -224,7 +207,6 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
 
 <!-- S2 NAME -->
 <div class="screen" id="s2">
-  <div class="glow-orb" style="width:200px;height:200px;background:rgba(110,164,246,0.15);top:60px;right:-60px;"></div>
   <div style="margin-top:80px;"></div>
   <div class="h2" style="margin-bottom:48px;">Как тебя<br>зовут?</div>
   <input class="input" id="nameInput" type="text" placeholder="Введи имя" style="margin-bottom:20px;">
@@ -233,11 +215,10 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
 
 <!-- S3 AGE -->
 <div class="screen" id="s3">
-  <div class="glow-orb" style="width:250px;height:250px;background:rgba(123,110,246,0.12);bottom:0;right:-80px;"></div>
   <div style="margin-top:80px;"></div>
   <div class="h2" style="margin-bottom:44px;">Сколько<br>тебе лет?</div>
-  <input class="input" id="ageInput" type="number" min="10" max="99" placeholder="Введите возраст" style="margin-bottom:12px;">
-  <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:40px;line-height:1.5;">Возраст нужен для<br>персонализации задач</div>
+  <input class="input" id="ageInput" type="number" min="10" max="99" placeholder="Введи возраст" style="margin-bottom:12px;">
+  <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:40px;">Для персонализации задач</div>
   <button class="btn btn-primary" style="margin-top:auto;" onclick="nav('s4')">Далее</button>
 </div>
 
@@ -245,7 +226,7 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
 <div class="screen" id="s4" style="justify-content:flex-start;padding-top:44px;">
   <div class="glow-orb" style="width:300px;height:200px;background:rgba(123,110,246,0.12);bottom:0;left:50%;transform:translateX(-50%);"></div>
   <div class="h2 grad-text" style="margin-bottom:28px;">Выбери сферы<br>для прокачки</div>
-  <div class="sphere-grid" style="margin-bottom:20px;" id="sphereGrid">
+  <div class="sphere-grid" style="margin-bottom:16px;" id="sphereGrid">
     <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Тело">💪 Тело</button>
     <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Разум">🧠 Разум</button>
     <button class="sphere-btn sel" onclick="toggleSphere(this)" data-s="Финансы">📈 Финансы</button>
@@ -255,17 +236,17 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
     <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Отношения">🤝 Отношения</button>
     <button class="sphere-btn" onclick="toggleSphere(this)" data-s="Топ. жизнь">🔥 Топ. жизнь</button>
   </div>
+  <button class="btn btn-ghost btn-sm" style="margin-bottom:12px;" onclick="openModal('mAddSphere')">＋ Своя сфера</button>
   <button class="btn btn-primary" onclick="saveSpheres()">Продолжить</button>
 </div>
 
 <!-- S5 GOAL -->
 <div class="screen" id="s5" style="justify-content:center;">
-  <div class="glow-orb" style="width:220px;height:220px;background:rgba(110,164,246,0.15);top:40px;right:-70px;"></div>
   <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:20px;" id="goalStep">Шаг 1 из 1</div>
   <div style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:24px;padding:24px;margin-bottom:20px;">
     <div style="font-size:12px;font-weight:700;margin-bottom:8px;" id="goalSphLabel">Сфера: Тело</div>
     <div class="h2" style="text-align:left;font-size:22px;margin-bottom:20px;">Какая твоя цель<br>в этой сфере?</div>
-    <input class="input" id="goalInput" type="text" placeholder="Например: сбросить 5 кг">
+    <input class="input" id="goalInput" type="text" placeholder="Например: сбросить 5 кг" id="goalInputEx">
   </div>
   <button class="btn btn-primary" onclick="saveGoal()">Далее</button>
 </div>
@@ -274,8 +255,8 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
 <div class="screen" id="s6" style="justify-content:center;">
   <div class="glow-orb" style="width:280px;height:200px;background:rgba(123,110,246,0.15);bottom:0;left:50%;transform:translateX(-50%);"></div>
   <div class="h2" style="margin-bottom:12px;">Добавь первую задачу</div>
-  <div style="font-size:14px;color:var(--muted);text-align:center;margin-bottom:32px;">Что ты сделаешь уже завтра?</div>
-  <input class="input" id="taskInput" type="text" placeholder="Например: 30 подтягиваний" style="margin-bottom:20px;">
+  <div style="font-size:14px;color:var(--muted);text-align:center;margin-bottom:32px;">Что ты сделаешь уже сегодня?</div>
+  <input class="input" id="taskInput" type="text" placeholder="Например: пробежать 3 км" style="margin-bottom:20px;">
   <button class="btn btn-primary" onclick="saveFirstTask()">Добавить задачу</button>
 </div>
 
@@ -326,28 +307,30 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
   <div class="shead">
     <div style="font-family:'Unbounded',sans-serif;font-size:17px;font-weight:800;flex:1;">🏆 Топ игроков</div>
   </div>
-  <div class="top3" id="top3">
-    <div style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0;width:100%;">Загрузка...</div>
+  <div class="lb-toggle">
+    <button class="lb-toggle-btn active" id="lbBtnStreak" onclick="switchLb('streak',this)">🔥 По стрику</button>
+    <button class="lb-toggle-btn" id="lbBtnXp" onclick="switchLb('xp',this)">⭐ По XP</button>
   </div>
+  <div class="top3" id="top3"><div style="text-align:center;color:var(--muted);font-size:13px;width:100%;">Загрузка...</div></div>
   <div id="lbList" style="width:100%;display:flex;flex-direction:column;gap:8px;"></div>
 </div>
 
 <!-- S10 GOALS -->
 <div class="screen" id="s10" style="justify-content:flex-start;padding-bottom:88px;gap:10px;">
   <div class="shead"><div style="font-family:'Unbounded',sans-serif;font-size:17px;font-weight:800;">🎯 Мои цели</div></div>
-  <div id="goalsList" style="width:100%;display:flex;flex-direction:column;gap:10px;"></div>
+  <div id="goalsList" style="width:100%;"></div>
   <button class="add-dashed" onclick="openModal('mAddGoal')">＋ Добавить цель</button>
 </div>
 
 <!-- S11 TASKS -->
 <div class="screen" id="s11" style="justify-content:flex-start;padding-bottom:88px;gap:10px;">
   <div class="shead"><div style="font-family:'Unbounded',sans-serif;font-size:17px;font-weight:800;">📋 Задачи</div></div>
-  <div class="filter-tabs">
+  <div class="filter-tabs" id="taskFilterTabs">
     <button class="filter-tab active" onclick="filterTasks('all',this)">Все</button>
     <button class="filter-tab" onclick="filterTasks('active',this)">Активные</button>
     <button class="filter-tab" onclick="filterTasks('done',this)">Готово</button>
   </div>
-  <div id="fullTaskList" style="width:100%;display:flex;flex-direction:column;gap:8px;"></div>
+  <div id="fullTaskList" style="width:100%;"></div>
   <button class="add-dashed" onclick="openModal('mAddTask')">＋ Добавить задачу</button>
 </div>
 
@@ -413,13 +396,13 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-close" onclick="closeModal('mAddTask')">✕</div>
-    <div class="modal-title">Новая задача</div>
+    <div class="modal-title" id="mAddTaskTitle">Новая задача</div>
     <input class="input" id="newTaskName" type="text" placeholder="Название задачи" style="margin-bottom:12px;">
     <div style="display:flex;gap:8px;margin-bottom:20px;">
       <select class="input" id="newTaskSph" style="flex:1;padding:12px 14px;cursor:pointer;"></select>
       <input class="input" id="newTaskXp" type="number" placeholder="XP" value="10" style="width:80px;padding:12px 14px;">
     </div>
-    <button class="btn btn-primary" onclick="addTask()">Добавить задачу</button>
+    <button class="btn btn-primary" id="mAddTaskBtn" onclick="submitTask()">Добавить задачу</button>
   </div>
 </div>
 
@@ -427,10 +410,10 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-close" onclick="closeModal('mAddGoal')">✕</div>
-    <div class="modal-title">Новая цель</div>
+    <div class="modal-title" id="mAddGoalTitle">Новая цель</div>
     <select class="input" id="newGoalSph" style="margin-bottom:12px;cursor:pointer;"></select>
     <input class="input" id="newGoalName" type="text" placeholder="Название цели" style="margin-bottom:20px;">
-    <button class="btn btn-primary" onclick="addGoalApi()">Создать цель</button>
+    <button class="btn btn-primary" id="mAddGoalBtn" onclick="submitGoal()">Создать цель</button>
   </div>
 </div>
 
@@ -444,41 +427,62 @@ body { background:var(--bg); font-family:'Manrope',sans-serif; color:var(--text)
   </div>
 </div>
 
-<!-- TOAST -->
+<div class="modal" id="mAddSphere">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-close" onclick="closeModal('mAddSphere')">✕</div>
+    <div class="modal-title">Своя сфера</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <input class="input" id="newSphereEmoji" type="text" placeholder="🎯" style="width:70px;padding:12px;text-align:center;font-size:22px;">
+      <input class="input" id="newSphereName" type="text" placeholder="Название сферы" style="flex:1;">
+    </div>
+    <button class="btn btn-primary" onclick="addCustomSphere()">Добавить сферу</button>
+  </div>
+</div>
+
 <div class="toast" id="toast">
   <div class="toast-val" id="tVal">+10 XP</div>
   <div class="toast-lbl" id="tLbl">Задача выполнена!</div>
 </div>
 
 <script>
-// ── CONFIG ──
-const SPHERES = ['Тело','Разум','Финансы','Образование','Дисциплина','Духовность','Отношения','Топ. жизнь'];
-const COLORS = { 'Тело':'#f97316','Разум':'#8b5cf6','Финансы':'#4ade80','Образование':'#60a5fa','Дисциплина':'#f59e0b','Духовность':'#a78bfa','Отношения':'#ec4899','Топ. жизнь':'#ef4444' };
+const SPHERE_EXAMPLES = {
+  'Тело': 'Например: пробежать 5 км каждый день',
+  'Разум': 'Например: читать 20 страниц в день',
+  'Финансы': 'Например: откладывать 20% дохода',
+  'Образование': 'Например: пройти курс по программированию',
+  'Дисциплина': 'Например: вставать в 6 утра каждый день',
+  'Духовность': 'Например: медитировать 10 минут в день',
+  'Отношения': 'Например: раз в неделю встречаться с друзьями',
+  'Топ. жизнь': 'Например: стать лучшей версией себя',
+};
+const SPHERE_ICONS = {
+  'Тело':'💪','Разум':'🧠','Финансы':'📈','Образование':'📚',
+  'Дисциплина':'⚡','Духовность':'🌱','Отношения':'🤝','Топ. жизнь':'🔥'
+};
+const COLORS = {
+  'Тело':'#f97316','Разум':'#8b5cf6','Финансы':'#4ade80','Образование':'#60a5fa',
+  'Дисциплина':'#f59e0b','Духовность':'#a78bfa','Отношения':'#ec4899','Топ. жизнь':'#ef4444'
+};
 const RANKS = ['Новобранец','Ученик','Воин','Ветеран','Чемпион','Легенда'];
 
-// Telegram user ID
 window.Telegram.WebApp.expand();
 const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
 const USER_ID = tgUser?.id ? String(tgUser.id) : 'demo_' + Math.random().toString(36).substr(2,9);
 const API = window.location.origin;
 
-// ── STATE ──
 let S = { name:'', xp:0, level:1, streak:0, spheres:[], goals:[], tasks:[], goalIdx:0 };
+let customSpheres = [];
+let lbMode = 'streak';
+let editingTaskId = null;
+let editingGoalId = null;
+let currentTaskFilter = 'all';
 
-// ── INIT ──
 async function init() {
-  // populate selects
-  SPHERES.forEach(s => {
-    ['newTaskSph','newGoalSph'].forEach(id => {
-      const sel = document.getElementById(id);
-      if(sel) { const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); }
-    });
-  });
-
+  rebuildSelects();
   try {
     const user = await apiGet('/api/user/' + USER_ID);
     if(user && user.telegram_id) {
-      // existing user — go to dashboard
       S.name = user.name || tgUser?.first_name || 'Игрок';
       S.xp = user.xp || 0;
       S.level = user.level || 1;
@@ -486,7 +490,6 @@ async function init() {
       document.getElementById('loadingScreen').style.display = 'none';
       goToApp();
     } else {
-      // new user
       S.name = tgUser?.first_name || '';
       document.getElementById('nameInput').value = S.name;
       document.getElementById('loadingScreen').style.display = 'none';
@@ -498,23 +501,53 @@ async function init() {
   }
 }
 
-// ── API ──
+function getAllSpheres() {
+  const base = ['Тело','Разум','Финансы','Образование','Дисциплина','Духовность','Отношения','Топ. жизнь'];
+  return [...base, ...customSpheres];
+}
+
+function getSphereColor(s) { return COLORS[s] || '#7B6EF6'; }
+function getSphereIcon(s) { return SPHERE_ICONS[s] || '⭐'; }
+
+function rebuildSelects() {
+  const all = getAllSpheres();
+  ['newTaskSph','newGoalSph'].forEach(id => {
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = '';
+    all.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s; o.textContent = getSphereIcon(s) + ' ' + s;
+      sel.appendChild(o);
+    });
+    if(cur) sel.value = cur;
+  });
+}
+
 async function apiGet(url) {
   const r = await fetch(API + url);
+  if(!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
 }
 async function apiPost(url, data) {
   const r = await fetch(API + url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
   return r.json();
 }
+async function apiDelete(url) {
+  const r = await fetch(API + url, { method:'DELETE' });
+  return r.json();
+}
+async function apiPut(url, data) {
+  const r = await fetch(API + url, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+  return r.json();
+}
 
-// ── NAVIGATION ──
 const APP_SCREENS = ['s8','s9','s10','s11','s12'];
 function nav(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  const bn = document.getElementById('bottomNav');
-  bn.style.display = APP_SCREENS.includes(id) ? 'flex' : 'none';
+  document.getElementById('bottomNav').style.display = APP_SCREENS.includes(id) ? 'flex' : 'none';
 }
 function setActiveNav(id) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -525,59 +558,72 @@ function switchTab(id) {
   nav(id); setActiveNav(id);
   if(id==='s9') renderLeaderboard();
   if(id==='s10') renderGoals();
-  if(id==='s11') renderFullTasks('all');
+  if(id==='s11') renderFullTasks(currentTaskFilter);
   if(id==='s12') refreshSettings();
 }
 
-// ── ONBOARDING ──
 function saveName() {
   const v = document.getElementById('nameInput').value.trim();
   if(v) S.name = v;
   nav('s3');
 }
 function toggleSphere(btn) { btn.classList.toggle('sel'); }
+
+function addCustomSphere() {
+  const emoji = document.getElementById('newSphereEmoji').value.trim() || '⭐';
+  const name = document.getElementById('newSphereName').value.trim();
+  if(!name) { showToast('⚠️','Введи название'); return; }
+  customSpheres.push(name);
+  SPHERE_ICONS[name] = emoji;
+  COLORS[name] = '#7B6EF6';
+  const btn = document.createElement('button');
+  btn.className = 'sphere-btn';
+  btn.dataset.s = name;
+  btn.onclick = function(){ this.classList.toggle('sel'); };
+  btn.textContent = emoji + ' ' + name;
+  document.getElementById('sphereGrid').appendChild(btn);
+  rebuildSelects();
+  closeModal('mAddSphere');
+  showToast('✅ Сфера добавлена', name);
+}
+
 function saveSpheres() {
   S.spheres = [...document.querySelectorAll('#sphereGrid .sphere-btn.sel')].map(b => b.dataset.s);
   if(!S.spheres.length) { showToast('⚠️ Выбери сферу','хотя бы одну'); return; }
   S.goalIdx = 0;
   showGoalStep();
 }
+
 function showGoalStep() {
   if(S.goalIdx >= S.spheres.length) { nav('s6'); return; }
   document.getElementById('goalStep').textContent = `Шаг ${S.goalIdx+1} из ${S.spheres.length}`;
   const sph = S.spheres[S.goalIdx];
-  document.getElementById('goalSphLabel').textContent = 'Сфера: ' + sph;
-  document.getElementById('goalSphLabel').style.color = COLORS[sph] || 'var(--accent2)';
-  document.getElementById('goalInput').value = '';
+  document.getElementById('goalSphLabel').textContent = getSphereIcon(sph) + ' ' + sph;
+  document.getElementById('goalSphLabel').style.color = getSphereColor(sph);
+  const inp = document.getElementById('goalInput');
+  inp.value = '';
+  inp.placeholder = SPHERE_EXAMPLES[sph] || 'Введи цель для сферы ' + sph;
   nav('s5');
 }
+
 function saveGoal() {
   const v = document.getElementById('goalInput').value.trim();
-  if(v) S.goals.push({ sphere:S.spheres[S.goalIdx], name:v, progress:0 });
+  if(v) S.goals.push({ sphere: S.spheres[S.goalIdx], name: v, progress: 0 });
   S.goalIdx++;
   showGoalStep();
 }
+
 async function saveFirstTask() {
   const v = document.getElementById('taskInput').value.trim();
-  if(v) S.tasks.push({ name:v, sphere:S.spheres[0]||'Тело', xp:10, done:false });
+  if(v) S.tasks.push({ name: v, sphere: S.spheres[0]||'Тело', xp: 10, done: false });
   nav('s7');
 }
 
 async function goToApp() {
-  // create/sync user
   await apiPost('/api/user/' + USER_ID + '/sync', { name: S.name || tgUser?.first_name || 'Игрок' });
-
-  // save goals from onboarding
-  for(const g of S.goals) {
-    await apiPost('/api/goals/' + USER_ID, { sphere:g.sphere, name:g.name });
-  }
-  // save tasks from onboarding
-  for(const t of S.tasks) {
-    await apiPost('/api/tasks/' + USER_ID, { name:t.name, sphere:t.sphere, xp:t.xp });
-  }
+  for(const g of S.goals) await apiPost('/api/goals/' + USER_ID, { sphere:g.sphere, name:g.name });
+  for(const t of S.tasks) await apiPost('/api/tasks/' + USER_ID, { name:t.name, sphere:t.sphere, xp:t.xp });
   S.goals = []; S.tasks = [];
-
-  // load fresh data
   await loadUserData();
   nav('s8'); setActiveNav('s8');
 }
@@ -585,40 +631,35 @@ async function goToApp() {
 async function loadUserData() {
   try {
     const user = await apiGet('/api/user/' + USER_ID);
-    if(user && user.name) {
-      S.name = user.name; S.xp = user.xp||0; S.level = user.level||1; S.streak = user.streak||0;
-    }
+    if(user && user.name) { S.name=user.name; S.xp=user.xp||0; S.level=user.level||1; S.streak=user.streak||0; }
     S.tasks = await apiGet('/api/tasks/' + USER_ID);
-    updateUI();
-    renderTasks();
+    updateUI(); renderTasks();
   } catch(e) { console.error(e); }
 }
 
-// ── UI UPDATE ──
 function updateUI() {
   const needed = S.level * 100;
-  const pct = Math.min((S.xp / needed) * 100, 100);
-  safeSet('xpFill', el => el.style.width = pct + '%');
-  safeSet('xpLabel', el => el.textContent = S.xp + ' XP');
-  safeSet('xpMax', el => el.textContent = `до Ур.${S.level+1}: ${needed-S.xp} XP`);
-  safeSet('lvBadge', el => el.textContent = 'Уровень ' + S.level);
-  safeSet('rankTitle', el => el.textContent = RANKS[Math.min(S.level-1,RANKS.length-1)]);
-  safeSet('statS', el => el.textContent = '🔥 ' + S.streak);
+  const pct = Math.min((S.xp/needed)*100, 100);
+  ss('xpFill', el => el.style.width = pct + '%');
+  ss('xpLabel', el => el.textContent = S.xp + ' XP');
+  ss('xpMax', el => el.textContent = `до Ур.${S.level+1}: ${needed-S.xp} XP`);
+  ss('lvBadge', el => el.textContent = 'Уровень ' + S.level);
+  ss('rankTitle', el => el.textContent = RANKS[Math.min(S.level-1,RANKS.length-1)]);
+  ss('statS', el => el.textContent = '🔥 ' + S.streak);
   const done = (S.tasks||[]).filter(t=>t.done||t.done===1).length;
-  safeSet('statD', el => el.textContent = `${done}/${(S.tasks||[]).length}`);
-  ['av','lbAv','sAv','dAv'].forEach(id => safeSet(id, el => el.textContent = (S.name||'?')[0].toUpperCase()));
-  ['dn','lbN','dName'].forEach(id => safeSet(id, el => el.textContent = id==='lbN'?S.name+' (Ты)':S.name));
-  safeSet('sAv', el => el.textContent = (S.name||'?')[0].toUpperCase());
-  safeSet('sUN', el => el.textContent = S.name);
-  safeSet('sLV', el => el.textContent = `Уровень ${S.level} · ${S.xp} XP`);
+  ss('statD', el => el.textContent = `${done}/${(S.tasks||[]).length}`);
+  const initial = (S.name||'?')[0].toUpperCase();
+  ['av','sAv'].forEach(id => ss(id, el => el.textContent = initial));
+  ss('dn', el => el.textContent = S.name);
+  ss('sUN', el => el.textContent = S.name);
+  ss('sLV', el => el.textContent = `Уровень ${S.level} · ${S.xp} XP`);
 }
-function safeSet(id, fn) { const el=document.getElementById(id); if(el) fn(el); }
+function ss(id, fn) { const el=document.getElementById(id); if(el) fn(el); }
 
-// ── TASKS ──
 function renderTasks() {
   const list = document.getElementById('taskList');
   if(!list) return;
-  if(!S.tasks || !S.tasks.length) { list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0;">Нет задач на сегодня</div>'; return; }
+  if(!S.tasks||!S.tasks.length) { list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0;">Нет задач на сегодня</div>'; return; }
   list.innerHTML = '';
   S.tasks.slice(0,5).forEach((t,i) => {
     const isDone = t.done===1||t.done===true;
@@ -651,100 +692,238 @@ async function completeAll() {
   const u = await apiGet('/api/user/'+USER_ID);
   S.xp=u.xp; S.level=u.level;
   updateUI(); renderTasks();
-  if(gained>0) showToast('+'+ gained+' XP','🎉 Все задачи!');
-  else showToast('✅ Уже всё!','Молодец!');
+  showToast(gained>0 ? '+'+gained+' XP' : '✅ Всё!', gained>0?'🎉 Все задачи!':'Молодец!');
 }
 
-async function addTask() {
+// TASK MODAL - edit/add
+function openAddTaskModal(prefillSphere) {
+  editingTaskId = null;
+  ss('mAddTaskTitle', el => el.textContent = 'Новая задача');
+  ss('mAddTaskBtn', el => el.textContent = 'Добавить задачу');
+  document.getElementById('newTaskName').value = '';
+  document.getElementById('newTaskXp').value = '10';
+  if(prefillSphere) document.getElementById('newTaskSph').value = prefillSphere;
+  openModal('mAddTask');
+}
+
+function openEditTaskModal(t) {
+  editingTaskId = t.id;
+  ss('mAddTaskTitle', el => el.textContent = 'Редактировать задачу');
+  ss('mAddTaskBtn', el => el.textContent = 'Сохранить');
+  document.getElementById('newTaskName').value = t.name;
+  document.getElementById('newTaskSph').value = t.sphere;
+  document.getElementById('newTaskXp').value = t.xp || 10;
+  openModal('mAddTask');
+}
+
+async function submitTask() {
   const name = document.getElementById('newTaskName').value.trim();
   const sphere = document.getElementById('newTaskSph').value;
   const xp = parseInt(document.getElementById('newTaskXp').value)||10;
-  if(!name){ showToast('⚠️','Введи название'); return; }
-  await apiPost('/api/tasks/'+USER_ID, { name, sphere, xp });
-  document.getElementById('newTaskName').value = '';
+  if(!name) { showToast('⚠️','Введи название'); return; }
+
+  if(editingTaskId) {
+    await apiPut('/api/tasks/'+USER_ID+'/'+editingTaskId, { name, sphere, xp });
+    showToast('✅ Обновлено', name);
+  } else {
+    await apiPost('/api/tasks/'+USER_ID, { name, sphere, xp });
+    showToast('✅ Добавлено', name);
+  }
   closeModal('mAddTask');
   S.tasks = await apiGet('/api/tasks/'+USER_ID);
-  renderTasks(); renderFullTasks('all');
-  showToast('✅ Добавлено', name);
+  renderTasks(); renderFullTasks(currentTaskFilter);
+}
+
+async function deleteTask(id) {
+  await apiDelete('/api/tasks/'+USER_ID+'/'+id);
+  S.tasks = await apiGet('/api/tasks/'+USER_ID);
+  renderTasks(); renderFullTasks(currentTaskFilter);
+  showToast('🗑 Удалено','');
 }
 
 function renderFullTasks(filter) {
+  currentTaskFilter = filter;
   const list = document.getElementById('fullTaskList');
   if(!list) return;
   list.innerHTML = '';
+
   const filtered = (S.tasks||[]).filter(t =>
     filter==='all' || (filter==='active'&&!(t.done===1||t.done===true)) || (filter==='done'&&(t.done===1||t.done===true))
   );
+
+  // Group by sphere
+  const grouped = {};
   filtered.forEach(t => {
-    const isDone = t.done===1||t.done===true;
-    const color = COLORS[t.sphere]||'#7B6EF6';
-    const row = document.createElement('div');
-    row.className = 'task-full-row';
-    row.innerHTML = `<div class="task-sphere-dot" style="background:${color};"></div><div class="task-full-info"><div class="task-full-name" style="${isDone?'text-decoration:line-through;opacity:0.5;':''}">${t.name}</div><div class="task-full-sub">${t.sphere} · +${t.xp||10} XP</div></div><div class="task-full-check${isDone?' done':''}">${isDone?'✓':''}</div>`;
-    row.onclick = async () => {
-      if(!isDone) {
-        t.done = true;
-        await apiPost('/api/tasks/'+USER_ID+'/complete/'+t.id, { amount:t.xp||10 });
-        const u = await apiGet('/api/user/'+USER_ID);
-        S.xp=u.xp; S.level=u.level;
-        updateUI(); renderFullTasks(filter); renderTasks();
-        showToast('+'+(t.xp||10)+' XP','✅ Выполнено!');
-      }
-    };
-    list.appendChild(row);
+    if(!grouped[t.sphere]) grouped[t.sphere] = [];
+    grouped[t.sphere].push(t);
+  });
+
+  if(!filtered.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0;">Нет задач</div>';
+    return;
+  }
+
+  Object.keys(grouped).forEach(sphere => {
+    const color = getSphereColor(sphere);
+    const icon = getSphereIcon(sphere);
+    const section = document.createElement('div');
+    section.className = 'sphere-section';
+    section.innerHTML = `<div class="sphere-section-header"><div class="sphere-dot" style="background:${color};"></div><div class="sphere-section-title">${icon} ${sphere}</div><div class="sphere-section-count">${grouped[sphere].length} задач</div><button onclick="openAddTaskModal('${sphere}')" style="background:rgba(123,110,246,0.15);border:1px solid rgba(123,110,246,0.3);border-radius:100px;padding:4px 10px;font-size:11px;color:var(--accent2);cursor:pointer;font-family:'Manrope',sans-serif;font-weight:600;">＋ Добавить</button></div>`;
+
+    grouped[sphere].forEach(t => {
+      const isDone = t.done===1||t.done===true;
+      const row = document.createElement('div');
+      row.className = 'task-full-row';
+      row.innerHTML = `
+        <div class="task-full-check${isDone?' done':''}">${isDone?'✓':''}</div>
+        <div class="task-full-info">
+          <div class="task-full-name" style="${isDone?'text-decoration:line-through;opacity:0.5;':''}">${t.name}</div>
+          <div class="task-full-sub">+${t.xp||10} XP</div>
+        </div>
+        <div class="task-actions">
+          <div class="icon-btn" onclick="openEditTaskModal(${JSON.stringify(t).replace(/"/g,'&quot;')})">✏️</div>
+          <div class="icon-btn del" onclick="deleteTask(${t.id})">🗑</div>
+        </div>`;
+      row.querySelector('.task-full-check').onclick = async () => {
+        if(!isDone) {
+          t.done = true;
+          await apiPost('/api/tasks/'+USER_ID+'/complete/'+t.id, { amount:t.xp||10 });
+          const u = await apiGet('/api/user/'+USER_ID);
+          S.xp=u.xp; S.level=u.level;
+          updateUI(); renderFullTasks(filter); renderTasks();
+          showToast('+'+(t.xp||10)+' XP','✅ Выполнено!');
+        }
+      };
+      section.appendChild(row);
+    });
+    list.appendChild(section);
   });
 }
 
-function filterTasks(f,btn) {
+function filterTasks(f, btn) {
   document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   renderFullTasks(f);
 }
 
-// ── GOALS ──
+// GOAL MODAL
+function openAddGoalModal(prefillSphere) {
+  editingGoalId = null;
+  ss('mAddGoalTitle', el => el.textContent = 'Новая цель');
+  ss('mAddGoalBtn', el => el.textContent = 'Создать цель');
+  document.getElementById('newGoalName').value = '';
+  if(prefillSphere) document.getElementById('newGoalSph').value = prefillSphere;
+  openModal('mAddGoal');
+}
+
+function openEditGoalModal(g) {
+  editingGoalId = g.id;
+  ss('mAddGoalTitle', el => el.textContent = 'Редактировать цель');
+  ss('mAddGoalBtn', el => el.textContent = 'Сохранить');
+  document.getElementById('newGoalName').value = g.name;
+  document.getElementById('newGoalSph').value = g.sphere;
+  openModal('mAddGoal');
+}
+
+async function submitGoal() {
+  const sphere = document.getElementById('newGoalSph').value;
+  const name = document.getElementById('newGoalName').value.trim();
+  if(!name) { showToast('⚠️','Введи название'); return; }
+
+  if(editingGoalId) {
+    await apiPut('/api/goals/'+USER_ID+'/'+editingGoalId, { sphere, name });
+    showToast('✅ Обновлено', name);
+  } else {
+    await apiPost('/api/goals/'+USER_ID, { sphere, name });
+    showToast('🎯 Цель добавлена', name);
+  }
+  closeModal('mAddGoal');
+  renderGoals();
+}
+
+async function deleteGoal(id) {
+  await apiDelete('/api/goals/'+USER_ID+'/'+id);
+  renderGoals();
+  showToast('🗑 Удалено','');
+}
+
 async function renderGoals() {
   const list = document.getElementById('goalsList');
   if(!list) return;
   const goals = await apiGet('/api/goals/'+USER_ID);
   list.innerHTML = '';
+
+  // Group by sphere
+  const grouped = {};
   goals.forEach(g => {
-    const color = COLORS[g.sphere]||'#7B6EF6';
-    const el = document.createElement('div');
-    el.className = 'goal-item';
-    el.innerHTML = `<div class="goal-sphere-tag" style="color:${color};">${g.sphere}</div><div class="goal-name2">${g.name}</div><div class="goal-prog-bg"><div class="goal-prog-fill" style="width:${g.progress||0}%;background:${color};"></div></div><div class="goal-prog-lbl">${g.progress||0}% выполнено</div>`;
-    el.onclick = async () => {
-      const np = Math.min(100,(g.progress||0)+10);
-      await apiPost('/api/goals/'+USER_ID+'/progress/'+g.id, { progress:np });
-      g.progress = np; el.querySelector('.goal-prog-fill').style.width=np+'%'; el.querySelector('.goal-prog-lbl').textContent=np+'% выполнено';
-      showToast('📈 +10%', g.name);
-    };
-    list.appendChild(el);
+    if(!grouped[g.sphere]) grouped[g.sphere] = [];
+    grouped[g.sphere].push(g);
   });
-  if(!goals.length) list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0;">Нет целей</div>';
+
+  if(!goals.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0;">Нет целей</div>';
+    return;
+  }
+
+  Object.keys(grouped).forEach(sphere => {
+    const color = getSphereColor(sphere);
+    const icon = getSphereIcon(sphere);
+    const section = document.createElement('div');
+    section.className = 'sphere-section';
+    section.innerHTML = `<div class="sphere-section-header"><div class="sphere-dot" style="background:${color};"></div><div class="sphere-section-title">${icon} ${sphere}</div><button onclick="openAddGoalModal('${sphere}')" style="background:rgba(123,110,246,0.15);border:1px solid rgba(123,110,246,0.3);border-radius:100px;padding:4px 10px;font-size:11px;color:var(--accent2);cursor:pointer;font-family:'Manrope',sans-serif;font-weight:600;margin-left:auto;">＋</button></div>`;
+
+    grouped[sphere].forEach(g => {
+      const el = document.createElement('div');
+      el.className = 'goal-item';
+      el.innerHTML = `
+        <div class="goal-item-header">
+          <div class="goal-item-info">
+            <div class="goal-name2">${g.name}</div>
+          </div>
+          <div class="task-actions">
+            <div class="icon-btn" onclick="openEditGoalModal(${JSON.stringify(g).replace(/"/g,'&quot;')})">✏️</div>
+            <div class="icon-btn del" onclick="deleteGoal(${g.id})">🗑</div>
+          </div>
+        </div>
+        <div class="goal-prog-bg"><div class="goal-prog-fill" id="gf${g.id}" style="width:${g.progress||0}%;background:${color};"></div></div>
+        <div class="goal-prog-row">
+          <div class="goal-prog-lbl" id="gl${g.id}">${g.progress||0}% выполнено</div>
+          <div class="goal-prog-btn" onclick="incrementGoal(${g.id},${g.progress||0},'${color}')">+10%</div>
+        </div>`;
+      section.appendChild(el);
+    });
+    list.appendChild(section);
+  });
 }
 
-async function addGoalApi() {
-  const sphere = document.getElementById('newGoalSph').value;
-  const name = document.getElementById('newGoalName').value.trim();
-  if(!name){ showToast('⚠️','Введи название'); return; }
-  await apiPost('/api/goals/'+USER_ID, { sphere, name });
-  document.getElementById('newGoalName').value = '';
-  closeModal('mAddGoal');
+async function incrementGoal(id, cur, color) {
+  const np = Math.min(100, cur+10);
+  await apiPost('/api/goals/'+USER_ID+'/progress/'+id, { progress:np });
+  ss('gf'+id, el => { el.style.width=np+'%'; });
+  ss('gl'+id, el => { el.textContent=np+'% выполнено'; });
+  showToast('📈 +10%','');
+  // re-render to update the onclick with new progress
   renderGoals();
-  showToast('🎯 Цель добавлена', name);
 }
 
-// ── LEADERBOARD ──
+// LEADERBOARD
+let lbSortMode = 'streak';
+function switchLb(mode, btn) {
+  lbSortMode = mode;
+  document.querySelectorAll('.lb-toggle-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLeaderboard();
+}
+
 async function renderLeaderboard() {
-  const data = await apiGet('/api/leaderboard');
+  const data = await apiGet('/api/leaderboard?sort=' + lbSortMode);
   const top3El = document.getElementById('top3');
   const lbEl = document.getElementById('lbList');
-  if(!data||!data.length) { top3El.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;width:100%;">Пока пусто</div>'; return; }
+  if(!data||!data.length) { top3El.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;width:100%;">Пока пусто</div>'; lbEl.innerHTML=''; return; }
 
   const medals = ['🥇','🥈','🥉'];
-  const pClasses = ['p1','p2','p3'];
-  const avClasses = ['r1','r2','r3'];
-  const heights = [56,44,34];
+  const pC = ['p1','p2','p3'];
+  const aC = ['r1','r2','r3'];
   const order = data.length>=3 ? [1,0,2] : [0,1,2];
   const top = data.slice(0,3);
 
@@ -752,27 +931,29 @@ async function renderLeaderboard() {
   order.forEach(idx => {
     if(!top[idx]) return;
     const u = top[idx];
+    const val = lbSortMode==='streak' ? '🔥'+u.streak+' дн.' : u.xp+' XP';
     const div = document.createElement('div');
     div.className = 'top-item';
-    div.innerHTML = `<div class="top-av ${avClasses[idx]}">${(u.name||'?')[0].toUpperCase()}</div><div style="font-size:18px;">${medals[idx]}</div><div class="top-uname">${u.name}</div><div class="top-xp2">${u.xp} XP</div><div class="pedestal ${pClasses[idx]}">${idx+1}</div>`;
+    div.innerHTML = `<div class="top-av ${aC[idx]}">${(u.name||'?')[0].toUpperCase()}</div><div style="font-size:18px;">${medals[idx]}</div><div class="top-uname">${u.name}</div><div class="top-xp2">${val}</div><div class="pedestal ${pC[idx]}">${idx+1}</div>`;
     top3El.appendChild(div);
   });
 
   lbEl.innerHTML = '';
   data.forEach((u,i) => {
     const isMe = u.telegram_id === USER_ID;
+    const val = lbSortMode==='streak' ? '🔥 '+u.streak+' дн.' : u.xp+' XP';
+    const sub = lbSortMode==='streak' ? u.xp+' XP' : '🔥 '+u.streak+' дн.';
     const div = document.createElement('div');
     div.className = 'lb-item' + (isMe?' me':'');
-    div.innerHTML = `<div class="lb-rank">${i+1}</div><div class="lb-av">${(u.name||'?')[0].toUpperCase()}</div><div class="lb-info"><div class="lb-name">${u.name}${isMe?' (Ты)':''}</div><div class="lb-streak">🔥 ${u.streak||0} дн.</div></div><div class="lb-xp2">${u.xp} XP</div>`;
+    div.innerHTML = `<div class="lb-rank">${i+1}</div><div class="lb-av">${(u.name||'?')[0].toUpperCase()}</div><div class="lb-info"><div class="lb-name">${u.name}${isMe?' (Ты)':''}</div><div class="lb-streak">${sub}</div></div><div class="lb-xp2">${val}</div>`;
     lbEl.appendChild(div);
   });
 }
 
-// ── SETTINGS ──
 function refreshSettings() {
-  safeSet('sAv', el => el.textContent = (S.name||'?')[0].toUpperCase());
-  safeSet('sUN', el => el.textContent = S.name);
-  safeSet('sLV', el => el.textContent = `Уровень ${S.level} · ${S.xp} XP`);
+  ss('sAv', el => el.textContent = (S.name||'?')[0].toUpperCase());
+  ss('sUN', el => el.textContent = S.name);
+  ss('sLV', el => el.textContent = `Уровень ${S.level} · ${S.xp} XP`);
 }
 
 function toggleNotif(name, id) {
@@ -794,25 +975,26 @@ async function saveProfile() {
   showToast('✅ Сохранено','');
 }
 
-// ── MODALS ──
 function openModal(id) {
-  if(id==='mEditProfile') safeSet('editName', el => el.value=S.name);
+  if(id==='mEditProfile') ss('editName', el => el.value=S.name);
+  if(id==='mAddTask' && !editingTaskId) { document.getElementById('newTaskName').value=''; document.getElementById('newTaskXp').value='10'; }
   document.getElementById(id).classList.add('open');
 }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
 
-// ── TOAST ──
+// Override openModal for add task from bottom button
+document.addEventListener('DOMContentLoaded', () => {});
+
 function showToast(val, lbl) {
-  safeSet('tVal', el => el.textContent=val);
-  safeSet('tLbl', el => el.textContent=lbl);
+  ss('tVal', el => el.textContent=val);
+  ss('tLbl', el => el.textContent=lbl);
   const t = document.getElementById('toast');
   t.classList.add('show');
   clearTimeout(window._tt);
   window._tt = setTimeout(()=>t.classList.remove('show'), 2200);
 }
 
-// ── RIPPLE ──
 document.addEventListener('click', e => {
   const btn = e.target.closest('.btn');
   if(!btn) return;
@@ -825,7 +1007,6 @@ document.addEventListener('click', e => {
   setTimeout(()=>r.remove(), 500);
 });
 
-// ── START ──
 init();
 </script>
 </body>

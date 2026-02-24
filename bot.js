@@ -99,11 +99,6 @@ app.post('/api/goals/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
-app.get('/api/leaderboard', async (req, res) => {
-  const data = await db.getLeaderboard();
-  res.json(data);
-});
-
 app.post('/api/user/:id/sync', async (req, res) => {
   const { name } = req.body;
   await db.createUser(req.params.id, name);
@@ -120,6 +115,39 @@ app.post('/api/goals/:id/progress/:goalId', async (req, res) => {
   const { progress } = req.body;
   await db.updateGoalProgress(req.params.goalId, progress);
   res.json({ ok: true });
+});
+
+// Обновить задачу
+app.put('/api/tasks/:uid/:id', async (req, res) => {
+  const { name, sphere, xp } = req.body;
+  await supabase.from('tasks').update({ name, sphere, xp }).eq('id', req.params.id).eq('telegram_id', req.params.uid);
+  res.json({ ok: true });
+});
+
+// Удалить задачу
+app.delete('/api/tasks/:uid/:id', async (req, res) => {
+  await supabase.from('tasks').delete().eq('id', req.params.id).eq('telegram_id', req.params.uid);
+  res.json({ ok: true });
+});
+
+// Обновить цель
+app.put('/api/goals/:uid/:id', async (req, res) => {
+  const { name, sphere } = req.body;
+  await supabase.from('goals').update({ name, sphere }).eq('id', req.params.id).eq('telegram_id', req.params.uid);
+  res.json({ ok: true });
+});
+
+// Удалить цель
+app.delete('/api/goals/:uid/:id', async (req, res) => {
+  await supabase.from('goals').delete().eq('id', req.params.id).eq('telegram_id', req.params.uid);
+  res.json({ ok: true });
+});
+
+// Лидерборд с сортировкой
+app.get('/api/leaderboard', async (req, res) => {
+  const sort = req.query.sort === 'xp' ? 'xp' : 'streak';
+  const { data } = await supabase.from('users').select('*').order(sort, { ascending: false }).limit(10);
+  res.json(data || []);
 });
 
 cron.schedule('0 8 * * *', async () => {
