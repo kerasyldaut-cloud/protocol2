@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const cron = require('node-cron');
 const db = require('./database');
+const fetch = (...args) => import('node-fetch').then(({default: f}) => f(...args));
 
 const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
 bot.on('polling_error', (err) => console.log('polling:', err.code));
