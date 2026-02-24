@@ -151,6 +151,43 @@ app.get('/api/leaderboard', async (req, res) => {
   res.json(data || []);
 });
 
+app.post('/api/ai', async (req, res) => {
+  const { userContext, messages } = req.body;
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'web-search-2025-03-05',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        system: `Ты Protocol AI — личный ИИ коуч в приложении для прокачки себя Protocol 2.0.
+Говори по-русски, молодёжно но по делу. Честный и прямой, не льстишь без причины.
+Максимум 200 слов. Эмодзи умеренно. Без markdown заголовков.
+Если нужна свежая информация — используй поиск.
+
+Данные пользователя:
+${userContext}`,
+        messages: messages,
+      }),
+    });
+    const data = await response.json();
+    const reply = (data.content || [])
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('') || 'Нет ответа от ИИ';
+    res.json({ reply });
+  } catch (e) {
+    console.error('AI error:', e);
+    res.status(500).json({ reply: 'Ошибка ИИ. Попробуй позже.' });
+  }
+});
+
 cron.schedule('0 8 * * *', async () => {
   const users = await db.getLeaderboard();
   users.forEach(u => {

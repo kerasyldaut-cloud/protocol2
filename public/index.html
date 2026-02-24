@@ -788,8 +788,8 @@ function renderFullTasks(filter) {
           <div class="task-full-sub">+${t.xp||10} XP</div>
         </div>
         <div class="task-actions">
-          <div class="icon-btn" class="edit-task-btn">✏️</div>
-          <div class="icon-btn del" class="del-task-btn">🗑</div>
+          <div class="icon-btn edit-task-btn">✏️</div>
+          <div class="icon-btn del del-task-btn">🗑</div>
         </div>`;
       if(row.querySelector('.edit-task-btn')) {
         row.querySelector('.edit-task-btn').onclick = (e) => { e.stopPropagation(); openEditTaskModal(t); };
@@ -892,8 +892,8 @@ async function renderGoals() {
             <div class="goal-name2">${g.name}</div>
           </div>
           <div class="task-actions">
-            <div class="icon-btn" class="edit-goal-btn">✏️</div>
-            <div class="icon-btn del" class="del-goal-btn">🗑</div>
+            <div class="icon-btn edit-goal-btn">✏️</div>
+            <div class="icon-btn del del-goal-btn">🗑</div>
           </div>
         </div>
         <div class="goal-prog-bg"><div class="goal-prog-fill" id="gf${g.id}" style="width:${g.progress||0}%;background:${color};"></div></div>
@@ -1112,24 +1112,16 @@ async function sendAiMessage(forcedText) {
   ss('aiStatus', el => el.innerHTML = '● Думаю...');
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch(API + '/api/ai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 800,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        system: `Ты Protocol AI — личный ИИ коуч в приложении для прокачки себя Protocol 2.0.
-Говори по-русски, молодёжно но по делу. Ты честный и прямой, не льстишь без причины.
-Максимум 150 слов. Используй эмодзи умеренно. Не используй markdown заголовки.
-
-Данные пользователя:
-${getUserContext()}`,
+        userContext: getUserContext(),
         messages: aiHistory.slice(-12),
       })
     });
     const data = await resp.json();
-    const reply = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('') || 'Что-то пошло не так. Попробуй ещё раз.';
+    const reply = data.reply || 'Что-то пошло не так. Попробуй ещё раз.';
     typingEl.remove();
     addAiMsg(reply, 'ai');
     aiHistory.push({ role:'assistant', content:reply });
