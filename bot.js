@@ -121,34 +121,33 @@ app.post('/api/goals/:id/progress/:goalId', async (req, res) => {
 // Обновить задачу
 app.put('/api/tasks/:uid/:id', async (req, res) => {
   const { name, sphere, xp } = req.body;
-  await supabase.from('tasks').update({ name, sphere, xp }).eq('id', req.params.id).eq('telegram_id', req.params.uid);
+  await db.updateTask(req.params.id, req.params.uid, { name, sphere, xp });
   res.json({ ok: true });
 });
 
 // Удалить задачу
 app.delete('/api/tasks/:uid/:id', async (req, res) => {
-  await supabase.from('tasks').delete().eq('id', req.params.id).eq('telegram_id', req.params.uid);
+  await db.deleteTask(req.params.id, req.params.uid);
   res.json({ ok: true });
 });
 
 // Обновить цель
 app.put('/api/goals/:uid/:id', async (req, res) => {
   const { name, sphere } = req.body;
-  await supabase.from('goals').update({ name, sphere }).eq('id', req.params.id).eq('telegram_id', req.params.uid);
+  await db.updateGoal(req.params.id, req.params.uid, { name, sphere });
   res.json({ ok: true });
 });
 
 // Удалить цель
 app.delete('/api/goals/:uid/:id', async (req, res) => {
-  await supabase.from('goals').delete().eq('id', req.params.id).eq('telegram_id', req.params.uid);
+  await db.deleteGoal(req.params.id, req.params.uid);
   res.json({ ok: true });
 });
 
 // Лидерборд с сортировкой
 app.get('/api/leaderboard', async (req, res) => {
-  const sort = req.query.sort === 'xp' ? 'xp' : 'streak';
-  const { data } = await supabase.from('users').select('*').order(sort, { ascending: false }).limit(10);
-  res.json(data || []);
+  const leaders = await db.getLeaderboard();
+  res.json(leaders);
 });
 
 app.post('/api/ai', async (req, res) => {

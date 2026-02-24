@@ -118,6 +118,42 @@ const updateGoalProgress = async (id, progress) => {
   if (error) console.error('updateGoalProgress error:', error.message);
 };
 
+const updateTask = async (id, telegram_id, fields) => {
+  const { error } = await supabase
+    .from('tasks')
+    .update(fields)
+    .eq('id', id)
+    .eq('telegram_id', telegram_id);
+  if (error) console.error('updateTask error:', error.message);
+};
+
+const deleteTask = async (id, telegram_id) => {
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .eq('id', id)
+    .eq('telegram_id', telegram_id);
+  if (error) console.error('deleteTask error:', error.message);
+};
+
+const updateGoal = async (id, telegram_id, fields) => {
+  const { error } = await supabase
+    .from('goals')
+    .update(fields)
+    .eq('id', id)
+    .eq('telegram_id', telegram_id);
+  if (error) console.error('updateGoal error:', error.message);
+};
+
+const deleteGoal = async (id, telegram_id) => {
+  const { error } = await supabase
+    .from('goals')
+    .delete()
+    .eq('id', id)
+    .eq('telegram_id', telegram_id);
+  if (error) console.error('deleteGoal error:', error.message);
+};
+
 // --- LEADERBOARD ---
 const getLeaderboard = async () => {
   const { data, error } = await supabase
@@ -140,8 +176,12 @@ module.exports = {
   getTodayTasks,
   addTask,
   completeTask,
+  updateTask,
+  deleteTask,
   getGoals,
   addGoal,
+  updateGoal,
+  deleteGoal,
   updateGoalProgress,
   getLeaderboard
 };
